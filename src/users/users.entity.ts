@@ -1,0 +1,68 @@
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { UserRole } from './users.role.enum';
+
+@Entity()
+export class Users {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    nullable: true,
+  })
+  role: UserRole;
+
+  @Column({ unique: true })
+  username: string;
+
+  @Column({
+    select: false,
+    nullable: false,
+  })
+  password: string;
+
+  @Column({
+    select: false,
+    nullable: false,
+  })
+  salt: string;
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  address: string;
+
+  @Column({ nullable: true })
+  avatar: string;
+
+  @Column()
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @Column()
+  createdBy: string;
+
+  @Column()
+  @UpdateDateColumn()
+  modifiedDate: Date;
+
+  @Column({ nullable: true })
+  modifiedBy: string;
+
+  @Column({ type: 'boolean', default: false })
+  isPwdChanged: boolean;
+
+  @Column({ default: true })
+  isActive: boolean;
+}
