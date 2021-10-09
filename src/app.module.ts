@@ -14,39 +14,39 @@ import { RolesGuard } from './users/guard/user.role.guard';
 import { StorageModule } from './storage/storage.module';
 import { Storage } from './storage/entities/storage.entity';
 import { OrderModule } from './order/order.module';
+import { devDb, herokuDb } from './config/db';
+
+const dbConfig = herokuDb; //herokuDb
 
 @Module({
-  // imports: [
-  //   ConfigModule.forRoot(),
-  //   AuthModule,
-  //   UsersModule,
-  //   PassportModule.register({ session: false }),
-  //   TypeOrmModule.forRoot({
-  //     type: process.env.DB_TYPE as any,
-  //     host: process.env.DB_HOST,
-  //     port: Number.parseInt(process.env.DB_PORT),
-  //     username: process.env.DB_USERNAME,
-  //     password: process.env.DB_PASSWORD,
-  //     database: process.env.DB_NAME,
-  //     entities: [Users, Storage],
-  //     synchronize: true,
-  //   }),
-  //   AuthModule,
-  //   StorageModule,
-  //   OrderModule,
-  // ],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    UsersModule,
+    PassportModule.register({ session: false }),
+    TypeOrmModule.forRoot({
+      type: 'postgres' as any,
+      ...dbConfig,
+      entities: [Users, Storage],
+      synchronize: true,
+      schema: 'public',
+    }),
+    AuthModule,
+    StorageModule,
+    // OrderModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
-    //   // useClass: CookieAuthenticationGuard,
-    // },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: RolesGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+      // useClass: CookieAuthenticationGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}

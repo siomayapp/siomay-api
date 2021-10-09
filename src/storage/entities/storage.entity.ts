@@ -32,7 +32,7 @@ export class Storage {
   @CreateDateColumn()
   createdDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   createdBy: string;
 
   @Column()
