@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
-import { Users } from './users.entity';
+import { Users } from './entities/users.entity';
 import { UsersService } from './users.service';
 
 describe('UsersController', () => {
@@ -23,7 +23,7 @@ describe('UsersController', () => {
       let result: Promise<Users[]>;
       jest.spyOn(usersService, 'findAll').mockImplementation(() => result);
 
-      expect(await usersController.getUsers()).toBe(result);
+      expect(await usersController.getAllUsers()).toBe(result);
     });
   });
 });

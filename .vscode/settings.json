@@ -1,5 +1,7 @@
 {
     "cSpell.words": [
         "nestjs"
-    ]
+    ],
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.quoteStyle": "single",
 }

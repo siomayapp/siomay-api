@@ -14,7 +14,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     username: string,
     password: string,
   ): Promise<IAuthResponseData> {
-    // TODO: caching token to redis
     return await this.authService.login(username, password);
   }
 }

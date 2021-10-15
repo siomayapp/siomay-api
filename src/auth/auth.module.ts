@@ -6,15 +6,17 @@ import { LocalStrategy } from './strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
+import { RedisCacheModule } from '../redis-cache/redis-cache.module';
 // import { SessionSerializer } from './utils/Serializer';rrrrrrr
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    UsersModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY,
     }),
+    RedisCacheModule,
+    UsersModule,
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy], //SessionSerializer
   controllers: [AuthController],

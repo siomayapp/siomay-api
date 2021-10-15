@@ -38,19 +38,19 @@ export class Users {
   salt: string;
 
   @Column({ nullable: true })
-  phone: string;
+  phone: string | null;
 
   @Column({ nullable: true })
-  address: string;
+  address: string | null;
 
   @Column({ nullable: true })
-  avatar: string;
+  avatar: string | null;
 
   @Column()
   @CreateDateColumn()
   createdDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   createdBy: string;
 
   @Column()

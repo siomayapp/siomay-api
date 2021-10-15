@@ -6,19 +6,22 @@ import {
   // UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { Users } from '../users/users.entity';
+import { Users } from '../users/entities/users.entity';
 import { randomBytes } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { IAuthResponseData } from './types';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { RedisCacheService } from '../redis-cache/redis-cache.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private redisCacheService: RedisCacheService,
   ) {}
 
-  async register(inputUser: Users): Promise<Users> {
+  async register(inputUser: CreateUserDto): Promise<Users> {
     try {
       const salt = randomBytes(32);
       const hashedPassword = await argon2.hash(inputUser.password, { salt });
@@ -57,10 +60,18 @@ export class AuthService {
       Reflect.deleteProperty(userRecord, 'password');
 
       const token = this.jwtService.sign({ ...userRecord });
+      await this.redisCacheService.set(
+        'token' + userRecord.id.toString(),
+        token,
+      );
 
       return { user: userRecord, token: token };
     } catch (error) {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async logout(userId: number): Promise<void> {
+    await this.redisCacheService.delete('token' + userId.toString());
   }
 }

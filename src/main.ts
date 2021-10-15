@@ -1,5 +1,7 @@
 /* eslint-disable prettier/prettier */
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 // import * as session from 'express-session';
 // import * as passport from 'passport';
@@ -7,12 +9,17 @@ import { AppModule } from './app.module';
 // import * as connectRedis from 'connect-redis';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // const redisClient = redis.createClient({ url: process.env.REDIS_HOST })
   // const RedisStore = connectRedis(session);
   // redisClient.on('connect', () => console.log('CONNECTED TO REDIS'));
 
   app.setGlobalPrefix('api');
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }));
+  app.enableCors();
   // app.use(session({
   //   cookie: {
   //     maxAge: 60000 * 60 * 24 * 90,

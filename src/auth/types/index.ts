@@ -1,11 +1,11 @@
-import { Session } from 'express-session';
-import { Users } from '../../users/users.entity';
+import { Users } from '../../users/entities/users.entity';
 
 export interface IRequestWithUser extends Request {
   user: Users;
-  session: Session;
+}
 
-  logOut();
+export interface IRequestHeader extends Headers {
+  authorization: string;
 }
 
 export interface IAuthResponseData {
