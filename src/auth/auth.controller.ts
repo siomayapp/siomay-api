@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpException,
   Post,
   Request,
   UploadedFile,
@@ -25,7 +26,9 @@ export class AuthController {
     @UploadedFile() file: Express.Multer.File,
     @Body() registrationData: CreateUserDto,
   ) {
-    console.log(file);
+    if (!file) {
+      throw new HttpException('Cannot save avatar', 400);
+    }
     registrationData.avatar = file.originalname;
     return await this.authService.register(registrationData);
   }
