@@ -23,10 +23,10 @@ export class VariantController {
     return await this.variantService.create(createVariantDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.variantService.findAll();
-  // }
+  @Get()
+  async findAll() {
+    return await this.variantService.findAll();
+  }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {

@@ -3,7 +3,7 @@ import { StorageTransactionType } from '../entities/storage-transaction.entity';
 
 export class CreateStorageTransactionDto {
   transactionType: StorageTransactionType;
-  box: Storage;
+  box: string;
   variant: string;
   amount: number;
 }

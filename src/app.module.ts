@@ -19,8 +19,9 @@ import { Variant } from './variant/entities/variant.entity';
 import { StorageTransactionModule } from './storage-transaction/storage-transaction.module';
 import { StorageTransaction } from './storage-transaction/entities/storage-transaction.entity';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
+import { Order } from './order/entities/order.entity';
 
-const dbConfig = devDb; //herokuDb
+const dbConfig = herokuDb; //devDb
 
 @Module({
   imports: [
@@ -28,17 +29,17 @@ const dbConfig = devDb; //herokuDb
     TypeOrmModule.forRoot({
       type: 'postgres' as any,
       ...dbConfig,
-      entities: [Users, Storage, Variant, StorageTransaction],
+      entities: [Users, Storage, Variant, StorageTransaction, Order],
       synchronize: true,
       schema: 'public',
     }),
-    RedisCacheModule,
+    // RedisCacheModule,
     AuthModule,
     UsersModule,
     StorageModule,
     VariantModule,
     StorageTransactionModule,
-    // OrderModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [

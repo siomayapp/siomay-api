@@ -15,12 +15,16 @@ export class VariantService {
     return await this.variantRepo.save(createVariantDto);
   }
 
-  // findAll() {
-  //   return `This action returns all variant`;
-  // }
+  async findAll(): Promise<Variant[]> {
+    return await this.variantRepo.find();
+  }
 
-  async findOne(id: number): Promise<Variant> {
-    return await this.variantRepo.findOneOrFail(id);
+  async findOne(id: number, selectColumn?: string[]): Promise<Variant> {
+    return selectColumn
+      ? await this.variantRepo.findOneOrFail(id, {
+          select: selectColumn as (keyof Variant)[],
+        })
+      : await this.variantRepo.findOneOrFail(id);
   }
 
   // update(id: number, updateVariantDto: UpdateVariantDto) {

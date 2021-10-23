@@ -6,7 +6,8 @@ import { IRequestHeader } from '../types';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private redisCacheService: RedisCacheService) {
+  // private redisCacheService: RedisCacheService
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -16,19 +17,19 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(req: Request, payload: any) {
-    const reqHeaders = req.headers as IRequestHeader;
-    const tokenFromRequest = reqHeaders.authorization.split('Bearer ')[1];
-    const token = await this.redisCacheService.get(
-      'token' + payload.id.toString(),
-    );
+    // const reqHeaders = req.headers as IRequestHeader;
+    // const tokenFromRequest = reqHeaders.authorization.split('Bearer ')[1];
+    // const token = await this.redisCacheService.get(
+    //   'token' + payload.id.toString(),
+    // );
 
-    if (!token) {
-      throw new UnauthorizedException();
-    }
+    // if (!token) {
+    //   throw new UnauthorizedException();
+    // }
 
-    if (tokenFromRequest != token) {
-      throw new UnauthorizedException();
-    }
+    // if (tokenFromRequest != token) {
+    //   throw new UnauthorizedException();
+    // }
 
     return payload;
   }

@@ -28,7 +28,7 @@ export class StorageService {
     );
     await this.stService.create({
       transactionType: 'in',
-      box: newStorage,
+      box: newStorage.boxName,
       variant: variant.name,
       amount: newStorage.amount,
     });
@@ -92,7 +92,7 @@ export class StorageService {
 
     await this.stService.create({
       transactionType: updateAmountDto.updateAmountType,
-      box: storage,
+      box: storage.boxName,
       variant: relatedVariant.name,
       amount: updateAmountDto.amount,
     });
@@ -101,6 +101,17 @@ export class StorageService {
   }
 
   async remove(id: number): Promise<void> {
+    const storage = await this.storageRepo.findOneOrFail(id, {
+      select: ['amount'],
+    });
+
+    if (storage.amount != 0) {
+      throw new HttpException(
+        'Cannot delete storage, because storage amount is not 0',
+        400,
+      );
+    }
+
     await this.storageRepo.delete(id);
   }
 }

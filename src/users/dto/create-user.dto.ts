@@ -1,11 +1,12 @@
 import { IsEmpty, IsMobilePhone, IsString, ValidateIf } from 'class-validator';
+import { UserRole } from '../entities/users.role.enum';
 
 export class CreateUserDto {
   @IsString()
   name: string;
 
   @IsString()
-  role: string;
+  role: UserRole;
 
   @IsString()
   username: string;

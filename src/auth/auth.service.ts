@@ -17,8 +17,7 @@ import { RedisCacheService } from '../redis-cache/redis-cache.service';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService,
-    private redisCacheService: RedisCacheService,
+    private jwtService: JwtService, // private redisCacheService: RedisCacheService,
   ) {}
 
   async register(inputUser: CreateUserDto): Promise<Users> {
@@ -60,10 +59,10 @@ export class AuthService {
       Reflect.deleteProperty(userRecord, 'password');
 
       const token = this.jwtService.sign({ ...userRecord });
-      await this.redisCacheService.set(
-        'token' + userRecord.id.toString(),
-        token,
-      );
+      // await this.redisCacheService.set(
+      //   'token' + userRecord.id.toString(),
+      //   token,
+      // );
 
       return { user: userRecord, token: token };
     } catch (error) {
@@ -72,6 +71,6 @@ export class AuthService {
   }
 
   async logout(userId: number): Promise<void> {
-    await this.redisCacheService.delete('token' + userId.toString());
+    // await this.redisCacheService.delete('token' + userId.toString());
   }
 }

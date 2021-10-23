@@ -2,9 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Order } from '../../order/entities/order.entity';
 import { Storage } from '../../storage/entities/storage.entity';
 
 export type StorageTransactionType = 'in' | 'out';
@@ -17,14 +17,18 @@ export class StorageTransaction {
   @Column({ name: 'type', type: 'enum', enum: ['in', 'out'] })
   transactionType: StorageTransactionType;
 
-  @ManyToOne(() => Storage, (box) => box.boxName, { onDelete: 'NO ACTION' })
-  box: Storage;
+  // @ManyToOne(() => Storage, (box) => box.boxName, { onDelete: 'SET NULL' })
+  @Column()
+  box: string;
 
   @Column()
   variant: string;
 
   @Column()
   amount: number;
+
+  @Column({ nullable: true })
+  orderId: number;
 
   @Column()
   @CreateDateColumn()
