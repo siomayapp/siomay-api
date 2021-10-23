@@ -25,6 +25,7 @@ export class AuthController {
     @UploadedFile() file: Express.Multer.File,
     @Body() registrationData: CreateUserDto,
   ) {
+    console.log(file);
     registrationData.avatar = file.originalname;
     return await this.authService.register(registrationData);
   }
