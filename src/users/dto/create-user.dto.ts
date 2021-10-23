@@ -27,5 +27,7 @@ export class CreateUserDto {
   @ValidateIf((object, value) => value == null)
   avatar: string | null;
 
-  salt: string;
+  @IsString()
+  @ValidateIf((object, value) => value == null)
+  createdBy: string;
 }
