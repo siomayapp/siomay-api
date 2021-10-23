@@ -30,4 +30,6 @@ export class CreateUserDto {
   @IsString()
   @ValidateIf((object, value) => value == null)
   createdBy: string;
+
+  salt: string;
 }
