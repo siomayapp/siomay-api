@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { StorageTransactionService } from '../storage-transaction/storage-transaction.service';
 import { Variant } from '../variant/entities/variant.entity';
 import { VariantService } from '../variant/variant.service';
@@ -35,8 +35,17 @@ export class StorageService {
     return await this.findOne(newStorage.id);
   }
 
-  async findAll(): Promise<Storage[]> {
-    return await this.storageRepo.find();
+  async findAll(
+    lastId: number,
+    limit: number,
+  ): Promise<[Storage[], number | null]> {
+    const storages = await this.storageRepo.find({
+      where: { id: MoreThan(lastId) },
+      take: limit,
+    });
+    const lastRow =
+      storages.length > 0 ? storages[storages.length - 1].id : null;
+    return [storages, lastRow];
   }
 
   async findOne(id: number): Promise<Storage> {

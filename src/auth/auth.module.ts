@@ -14,7 +14,7 @@ import { RedisCacheModule } from '../redis-cache/redis-cache.module';
     ConfigModule.forRoot(),
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '120s' },
+      signOptions: { expiresIn: '1d' },
     }),
     // RedisCacheModule,
     UsersModule,

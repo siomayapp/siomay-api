@@ -2,12 +2,16 @@ import {
   Body,
   Controller,
   HttpException,
+  HttpStatus,
   Post,
   Request,
+  Res,
   UploadedFile,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiFile, Public } from '../shared/decorators';
+import { HttpResponse } from '../shared/types';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guard/local-auth.guard';
@@ -25,24 +29,50 @@ export class AuthController {
   async register(
     @UploadedFile() file: Express.Multer.File,
     @Body() registrationData: CreateUserDto,
-  ) {
-    if (!file) {
-      throw new HttpException('Cannot save avatar', 400);
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<HttpResponse> {
+    try {
+      if (!file) {
+        res.status(400);
+        return { isSuccess: false, error: 'Cannot save avatar' };
+      }
+      registrationData.avatar = file.originalname;
+      const data = await this.authService.register(registrationData);
+      return { isSuccess: true, data };
+    } catch (error) {
+      res.status(500);
+      return { isSuccess: false, error: error.message };
     }
-    registrationData.avatar = file.originalname;
-    return await this.authService.register(registrationData);
   }
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req: IRequestWithUser) {
-    return req.user;
+  async login(
+    @Request() req: IRequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<HttpResponse> {
+    try {
+      const data = req.user;
+      res.status(HttpStatus.OK);
+      return { isSuccess: true, data };
+    } catch (error) {
+      res.status(500);
+      return { isSuccess: false, error: error.message };
+    }
   }
 
   @Post('logout')
-  async logout(@Request() req: IRequestWithUser) {
-    await this.authService.logout(req.user.id);
-    return 'OK';
+  async logout(
+    @Request() req: IRequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    try {
+      await this.authService.logout(req.user.id);
+      return { isSuccess: true };
+    } catch (error) {
+      res.status(500);
+      return { isSuccess: false, error: error.message };
+    }
   }
 }

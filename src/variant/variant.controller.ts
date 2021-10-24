@@ -6,12 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { VariantService } from './variant.service';
 import { CreateVariantDto } from './dto/create-variant.dto';
 import { UpdateVariantDto } from './dto/update-variant.dto';
 import { Roles } from 'src/shared/decorators';
 import { UserRole } from 'src/users/entities/users.role.enum';
+import { Response } from 'express';
+import { HttpResponse } from '../shared/types';
 
 @Controller('variant')
 export class VariantController {
@@ -19,13 +22,30 @@ export class VariantController {
 
   @Post()
   @Roles(UserRole.OWNER)
-  async create(@Body() createVariantDto: CreateVariantDto) {
-    return await this.variantService.create(createVariantDto);
+  async create(
+    @Body() createVariantDto: CreateVariantDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<HttpResponse> {
+    try {
+      const data = await this.variantService.create(createVariantDto);
+      return { isSuccess: true, data };
+    } catch (error) {
+      res.status(500);
+      return { isSuccess: false, error: error.message };
+    }
   }
 
   @Get()
-  async findAll() {
-    return await this.variantService.findAll();
+  async findAll(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<HttpResponse> {
+    try {
+      const data = await this.variantService.findAll();
+      return { isSuccess: true, data };
+    } catch (error) {
+      res.status(500);
+      return { isSuccess: false, error: error.message };
+    }
   }
 
   // @Get(':id')
@@ -39,13 +59,16 @@ export class VariantController {
   // }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<HttpResponse> {
     try {
       await this.variantService.remove(+id);
-      return 'OK';
+      return { isSuccess: true };
     } catch (error) {
-      console.log(error);
-      return 'Failed';
+      res.status(500);
+      return { isSuccess: false, error: error.message };
     }
   }
 }
