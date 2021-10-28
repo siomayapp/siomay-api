@@ -60,7 +60,7 @@ export class Order {
   @Column({ type: 'json' })
   variants: OrderVariant[];
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   statuses: OrderStatus[];
 
   // when orderType = periodic
