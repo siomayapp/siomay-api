@@ -17,6 +17,7 @@ export class UsersService {
     const users = await this.usersRepository.find({
       where: { id: MoreThan(lastId) },
       take: limit,
+      order: { id: 'ASC' },
     });
     const lastRowId = users.length > 0 ? users[users.length - 1].id : null;
     return [users, lastRowId];
