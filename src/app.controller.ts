@@ -14,7 +14,7 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Public()
+  // @Public()
   @ApiFile({
     allowedTypes: ['image/jpeg', 'image/jpg', 'image/png'],
     destination: 'public/uploads/avatar',
