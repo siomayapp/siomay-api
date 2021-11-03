@@ -21,22 +21,22 @@ import { IRequestWithUser } from './types';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiFile({
-    allowedTypes: ['image/jpeg', 'image/png'],
-    destination: 'public/uploads/avatar',
-  })
+  // @ApiFile({
+  //   allowedTypes: ['image/jpeg', 'image/png'],
+  //   destination: 'public/uploads/avatar',
+  // })
   @Post('register')
   async register(
-    @UploadedFile() file: Express.Multer.File,
+    // @UploadedFile() file: Express.Multer.File,
     @Body() registrationData: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
-      if (!file) {
-        res.status(400);
-        return { isSuccess: false, error: 'Cannot save avatar' };
-      }
-      registrationData.avatar = file.originalname;
+      // if (!file) {
+      //   res.status(400);
+      //   return { isSuccess: false, error: 'Cannot save avatar' };
+      // }
+      // registrationData.avatar = file.originalname;
       const data = await this.authService.register(registrationData);
       return { isSuccess: true, data };
     } catch (error) {
