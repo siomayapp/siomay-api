@@ -28,7 +28,7 @@ export class AppController {
       console.log(file);
       if (!file) {
         res.status(400);
-        return { isSuccess: false, error: 'Cannot save avatar' };
+        return { isSuccess: false, error: 'Gagal upload avatar' };
       }
 
       // registrationData.avatar = file.originalname;
