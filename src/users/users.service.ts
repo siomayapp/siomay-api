@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { MoreThan, Not, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Users } from './entities/users.entity';
+import { UserRole } from './entities/users.role.enum';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +16,7 @@ export class UsersService {
     limit: number,
   ): Promise<[Users[], number | null]> {
     const users = await this.usersRepository.find({
-      where: { id: MoreThan(lastId) },
+      where: { id: MoreThan(lastId), role: Not(UserRole.OWNER) },
       take: limit,
       order: { id: 'ASC' },
     });
