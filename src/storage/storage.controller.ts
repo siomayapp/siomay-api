@@ -113,7 +113,7 @@ export class StorageController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
-      this.storageService.remove(+id);
+      await this.storageService.remove(+id);
       return { isSuccess: true };
     } catch (error) {
       res.status(500);
