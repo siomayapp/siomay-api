@@ -20,6 +20,8 @@ import { StorageTransactionModule } from './storage-transaction/storage-transact
 import { StorageTransaction } from './storage-transaction/entities/storage-transaction.entity';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { Order } from './order/entities/order.entity';
+import { OrderHistoryModule } from './order-history/order-history.module';
+import { OrderHistory } from './order-history/entities/order-history.entity';
 
 const dbConfig = herokuDb; //devDb
 
@@ -29,9 +31,11 @@ const dbConfig = herokuDb; //devDb
     TypeOrmModule.forRoot({
       type: 'postgres' as any,
       ...dbConfig,
-      entities: [Users, Storage, Variant, StorageTransaction, Order],
       synchronize: true,
       schema: 'public',
+      logger: 'file',
+      timezone: 'Asia/Jakarta',
+      autoLoadEntities: true,
     }),
     // RedisCacheModule,
     AuthModule,
@@ -40,6 +44,7 @@ const dbConfig = herokuDb; //devDb
     VariantModule,
     StorageTransactionModule,
     OrderModule,
+    OrderHistoryModule,
   ],
   controllers: [AppController],
   providers: [

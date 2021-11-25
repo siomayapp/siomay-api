@@ -25,17 +25,23 @@ export enum OrderType {
 export interface OrderVariant {
   variant: Variant;
   amount: number;
+  isPicked: boolean;
 }
 
 export interface OrderStatus {
-  status: string;
+  status: 'incoming' | 'processing' | 'sending' | 'finish';
   statusDate: Date;
+  actor: string;
+  note: string | null;
 }
 
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number; //order number
+
+  @Column({ unique: true })
+  orderNumber: string;
 
   @Column({
     type: 'enum',
@@ -43,13 +49,15 @@ export class Order {
   })
   orderType: OrderType;
 
-  // when orderType = direct
-  @Column({ type: 'date', nullable: true })
-  deliveryDate: Date;
-
   // when orderType = periodic
   @Column({ nullable: true })
   deliveryFreq: number; //in days
+
+  @Column({ type: 'date', nullable: true })
+  deliveryDate: Date;
+
+  @Column({ type: 'date', nullable: true })
+  nextDeliveryDate: Date;
 
   @Column()
   customer: string;
@@ -64,11 +72,11 @@ export class Order {
   statuses: OrderStatus[];
 
   // when orderType = periodic
-  @Column({ nullable: true })
-  repeated: number; //number of repetition
+  @Column({ default: 0 })
+  cycle: number; //
 
   @Column({ nullable: true })
-  lastRepeat: Date;
+  lastCycle: Date;
 
   @Column()
   @CreateDateColumn()

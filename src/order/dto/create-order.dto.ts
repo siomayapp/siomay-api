@@ -1,12 +1,15 @@
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsDateString,
   IsNumber,
   IsString,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { Variant } from '../../variant/entities/variant.entity';
 import {
+  OrderStatus,
   OrderType,
   OrderVariant,
   // OrderVariantDetail,
@@ -34,6 +37,24 @@ class OrderVariantDto implements OrderVariant {
 
   @IsNumber()
   amount: number;
+
+  @IsBoolean()
+  isPicked: boolean;
+}
+
+export class OrderStatusDto implements OrderStatus {
+  @IsString()
+  status: 'incoming' | 'processing' | 'sending' | 'finish';
+
+  @IsDateString()
+  statusDate: Date;
+
+  @IsString()
+  actor: string;
+
+  @IsString()
+  @ValidateIf((object, value) => value !== null)
+  note: string | null;
 }
 
 export class CreateOrderDto {
@@ -55,4 +76,8 @@ export class CreateOrderDto {
   @ValidateNested()
   @Type(() => OrderVariantDto)
   variants: OrderVariantDto[];
+
+  @ValidateNested()
+  @Type(() => OrderStatusDto)
+  status: OrderStatusDto;
 }

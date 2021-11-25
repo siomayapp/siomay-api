@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
@@ -9,7 +9,9 @@ import { AppModule } from './app.module';
 // import * as connectRedis from 'connect-redis';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: new Logger()
+  });
   // const redisClient = redis.createClient({ url: process.env.REDIS_HOST })
   // const RedisStore = connectRedis(session);
   // redisClient.on('connect', () => console.log('CONNECTED TO REDIS'));
