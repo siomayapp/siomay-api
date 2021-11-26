@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { OrderHistoryService } from '../order-history/order-history.service';
 import { VariantService } from '../variant/variant.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -40,8 +40,16 @@ export class OrderService {
     return order;
   }
 
-  async findAll(): Promise<Order[]> {
-    return await this.orderRepo.find();
+  async findAll(
+    lastId: number,
+    limit: number,
+  ): Promise<[Order[], number | null]> {
+    const orders = await this.orderRepo.find({
+      where: { id: MoreThan(lastId) },
+      take: limit,
+    });
+    const lastRow = orders.length > 0 ? orders[orders.length - 1].id : null;
+    return [orders, lastRow];
   }
 
   async findOne(id: number): Promise<Order> {
