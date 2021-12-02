@@ -79,5 +79,5 @@ export class CreateOrderDto {
 
   @ValidateNested()
   @Type(() => OrderStatusDto)
-  status: OrderStatusDto;
+  statuses: OrderStatusDto[];
 }

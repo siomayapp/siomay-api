@@ -17,11 +17,15 @@ export class OrderService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const orderNumber = this.generateOrderNumber(createOrderDto);
-    const initialStatuses = [createOrderDto.status];
+    const initStatus =
+      createOrderDto.statuses[createOrderDto.statuses.length - 1];
+    const orderNumber = this.generateOrderNumber(
+      createOrderDto.orderType,
+      initStatus.statusDate,
+    );
     const order = await this.orderRepo.create({
       ...createOrderDto,
-      statuses: initialStatuses,
+      statuses: createOrderDto.statuses,
       orderNumber: orderNumber,
     });
     for (let i = 0; i < order.variants.length; i++) {
@@ -34,7 +38,7 @@ export class OrderService {
     }
     await this.orderHistoryService.create({
       order: order,
-      orderStatus: createOrderDto.status,
+      orderStatus: initStatus,
     });
 
     return order;
@@ -83,9 +87,9 @@ export class OrderService {
     return await this.orderRepo.save(processOrderDto);
   }
 
-  generateOrderNumber(createOrderDto: CreateOrderDto): string {
-    const firstPart = createOrderDto.orderType == 'periodic' ? 'PER' : 'DIR';
-    const newDate = new Date(createOrderDto.status.statusDate);
+  generateOrderNumber(orderType: string, initialStatusDate: Date): string {
+    const firstPart = orderType == 'periodic' ? 'PER' : 'DIR';
+    const newDate = new Date(initialStatusDate);
     const secondPart = `${newDate.getFullYear()}${
       newDate.getMonth() + 1
     }${newDate.getDate()}`;
