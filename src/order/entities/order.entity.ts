@@ -53,10 +53,10 @@ export class Order {
   @Column({ nullable: true })
   deliveryFreq: number; //in days
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   deliveryDate: Date;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   nextDeliveryDate: Date;
 
   @Column()
