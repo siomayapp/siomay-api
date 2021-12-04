@@ -4,6 +4,8 @@ import {
   HttpStatus,
   SetMetadata,
   UseInterceptors,
+  createParamDecorator,
+  ExecutionContext,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -41,3 +43,17 @@ export const ApiFile = ({
     ),
   );
 };
+
+export const Pagination = createParamDecorator(
+  (data, ctx: ExecutionContext) => {
+    const req = ctx.switchToHttp().getRequest();
+    return { last: req.query.last, limit: req.query.limit };
+  },
+);
+
+export const Filter = createParamDecorator((data, ctx: ExecutionContext) => {
+  const req = ctx.switchToHttp().getRequest();
+  delete req.query.last;
+  delete req.query.limit;
+  return req.query;
+});

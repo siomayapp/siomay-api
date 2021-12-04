@@ -1,12 +1,7 @@
 import { IsNumberString } from 'class-validator';
+import { IFilterStorage } from '../types';
 
-export class StorageReqQueryDto {
+export class FilterStorageDto implements IFilterStorage {
   @IsNumberString()
-  last: string;
-
-  @IsNumberString()
-  limit: string;
-
-  @IsNumberString()
-  variant?: string;
+  variant: number;
 }

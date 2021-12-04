@@ -12,13 +12,13 @@ import {
 import { StorageService } from './storage.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
-import { Roles } from 'src/shared/decorators';
+import { Roles, Filter, Pagination } from 'src/shared/decorators';
 import { UserRole } from 'src/users/entities/users.role.enum';
 import { UpdateStorageAmountDto } from './dto/update-storage-amount.dto';
-import { HttpResponse, IPagination } from '../shared/types';
+import { HttpResponse } from '../shared/types';
 import { Response } from 'express';
-import { StorageReqQueryDto } from './dto/request-query.dto';
-import { IFilterStorage } from './types';
+import { FilterStorageDto } from './dto/request-query.dto';
+import { PaginationDto } from '../shared/dto';
 
 @Controller('storage')
 export class StorageController {
@@ -42,20 +42,11 @@ export class StorageController {
   @Get()
   @Roles(UserRole.OWNER, UserRole.STORAGE)
   async findAll(
-    @Query() params: StorageReqQueryDto,
+    @Filter() filter: FilterStorageDto,
+    @Pagination() pagination: PaginationDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
-      const pagination = {
-        last: +params.last,
-        limit: +params.limit,
-      } as IPagination;
-
-      const filter = {} as IFilterStorage;
-      if (params.variant) {
-        filter.variant = +params.variant;
-      }
-
       const [data, lastRowId] = await this.storageService.findAll(
         pagination,
         filter,
