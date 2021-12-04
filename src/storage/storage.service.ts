@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
+import { IPagination } from '../shared/types';
 import { StorageTransactionService } from '../storage-transaction/storage-transaction.service';
 import { Variant } from '../variant/entities/variant.entity';
 import { VariantService } from '../variant/variant.service';
@@ -8,6 +9,7 @@ import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageAmountDto } from './dto/update-storage-amount.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
 import { Storage } from './entities/storage.entity';
+import { IFilterStorage } from './types';
 
 @Injectable()
 export class StorageService {
@@ -36,12 +38,12 @@ export class StorageService {
   }
 
   async findAll(
-    lastId: number,
-    limit: number,
+    pagination: IPagination,
+    filter: IFilterStorage,
   ): Promise<[Storage[], number | null]> {
     const storages = await this.storageRepo.find({
-      where: { id: MoreThan(lastId) },
-      take: limit,
+      where: { id: MoreThan(pagination.last), ...filter },
+      take: pagination.limit,
     });
     const lastRow =
       storages.length > 0 ? storages[storages.length - 1].id : null;

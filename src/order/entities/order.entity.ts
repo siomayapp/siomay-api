@@ -53,10 +53,10 @@ export class Order {
   @Column({ nullable: true })
   deliveryFreq: number; //in days
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp with time zone', nullable: true })
   deliveryDate: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp with time zone', nullable: true })
   nextDeliveryDate: Date;
 
   @Column()

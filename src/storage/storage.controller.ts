@@ -15,8 +15,10 @@ import { UpdateStorageDto } from './dto/update-storage.dto';
 import { Roles } from 'src/shared/decorators';
 import { UserRole } from 'src/users/entities/users.role.enum';
 import { UpdateStorageAmountDto } from './dto/update-storage-amount.dto';
-import { HttpResponse } from '../shared/types';
+import { HttpResponse, IPagination } from '../shared/types';
 import { Response } from 'express';
+import { StorageReqQueryDto } from './dto/request-query.dto';
+import { IFilterStorage } from './types';
 
 @Controller('storage')
 export class StorageController {
@@ -40,14 +42,23 @@ export class StorageController {
   @Get()
   @Roles(UserRole.OWNER, UserRole.STORAGE)
   async findAll(
-    @Query('last') last: string,
-    @Query('limit') limit: string,
+    @Query() params: StorageReqQueryDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
+      const pagination = {
+        last: +params.last,
+        limit: +params.limit,
+      } as IPagination;
+
+      const filter = {} as IFilterStorage;
+      if (params.variant) {
+        filter.variant = +params.variant;
+      }
+
       const [data, lastRowId] = await this.storageService.findAll(
-        +last,
-        +limit,
+        pagination,
+        filter,
       );
       return { isSuccess: true, data, lastRow: lastRowId };
     } catch (error) {

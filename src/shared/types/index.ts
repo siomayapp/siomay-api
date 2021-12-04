@@ -4,3 +4,8 @@ export interface HttpResponse {
   lastRow?: number | null;
   error?: any;
 }
+
+export interface IPagination {
+  last: number;
+  limit: number;
+}
