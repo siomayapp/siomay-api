@@ -22,10 +22,17 @@ export enum OrderType {
 //   amount: number;
 // }
 
+export interface OrderVariantStorage {
+  storage: string; //boxName
+  pickedAmount: number;
+}
+
 export interface OrderVariant {
   variant: Variant;
   amount: number;
   isPicked: boolean;
+  pickedFrom: OrderVariantStorage[];
+  pickedAmount: number;
 }
 
 export interface OrderStatus {

@@ -12,6 +12,7 @@ import {
   OrderStatus,
   OrderType,
   OrderVariant,
+  OrderVariantStorage,
   // OrderVariantDetail,
 } from '../entities/order.entity';
 
@@ -31,7 +32,15 @@ import {
 //   amount: number;
 // }
 
-class OrderVariantDto implements OrderVariant {
+export class OrderVariantStorageDto implements OrderVariantStorage {
+  @IsString()
+  storage: string;
+
+  @IsNumber()
+  pickedAmount: number;
+}
+
+export class OrderVariantDto implements OrderVariant {
   @IsNumber()
   variant: Variant;
 
@@ -40,6 +49,13 @@ class OrderVariantDto implements OrderVariant {
 
   @IsBoolean()
   isPicked: boolean;
+
+  @IsNumber()
+  pickedAmount: number;
+
+  @ValidateNested()
+  @ValidateIf((object, value) => value !== null)
+  pickedFrom: OrderVariantStorage[] | null;
 }
 
 export class OrderStatusDto implements OrderStatus {
