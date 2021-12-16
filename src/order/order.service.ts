@@ -3,10 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
 import { OrderHistoryService } from '../order-history/order-history.service';
 import { VariantService } from '../variant/variant.service';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderDto, OrderVariantDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import * as crypto from 'crypto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class OrderService {
@@ -14,6 +16,7 @@ export class OrderService {
     @InjectRepository(Order) private readonly orderRepo: Repository<Order>,
     private variantService: VariantService,
     private orderHistoryService: OrderHistoryService,
+    private storageService: StorageService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
@@ -83,8 +86,44 @@ export class OrderService {
     await this.orderRepo.delete(id);
   }
 
-  async processOrder(id: number, processOrderDto): Promise<Order> {
-    return await this.orderRepo.save(processOrderDto);
+  async updateStatus(
+    id: number,
+    updateOrderStatusDto: UpdateOrderStatusDto,
+  ): Promise<void> {
+    const newStatus =
+      updateOrderStatusDto.statuses[updateOrderStatusDto.statuses.length - 1];
+    if (newStatus.status == 'processing') {
+      await this.processOrder(updateOrderStatusDto.variants);
+    }
+    const order = await this.orderRepo.preload({ id, ...updateOrderStatusDto });
+    for (let i = 0; i < order.variants.length; i++) {
+      const dataVariant = order.variants[i];
+      const loadedVariant = await this.variantService.findOne(
+        dataVariant.variant as unknown as number,
+        ['id', 'name'],
+      );
+      order.variants[i].variant = loadedVariant;
+    }
+    await this.orderRepo.save(order);
+    await this.orderHistoryService.create({
+      order: order,
+      orderStatus: newStatus,
+    });
+  }
+
+  async processOrder(orderVariants: OrderVariantDto[]): Promise<void> {
+    orderVariants.forEach((variant) => {
+      variant.pickedFrom.forEach(async (storage) => {
+        await this.storageService.updateAmount(
+          {
+            amount: storage.pickedAmount,
+            updateAmountType: 'out',
+          },
+          undefined,
+          storage.storage,
+        );
+      });
+    });
   }
 
   generateOrderNumber(orderType: string, initialStatusDate: Date): string {

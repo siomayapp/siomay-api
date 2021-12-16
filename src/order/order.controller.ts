@@ -16,6 +16,7 @@ import { Roles } from '../shared/decorators';
 import { UserRole } from '../users/entities/users.role.enum';
 import { Response } from 'express';
 import { HttpResponse } from '../shared/types';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Controller('order')
 export class OrderController {
@@ -74,6 +75,22 @@ export class OrderController {
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
     return await this.orderService.update(+id, updateOrderDto);
+  }
+
+  @Patch('update-status/:id')
+  @Roles(UserRole.OWNER, UserRole.DISTRIBUTION)
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<HttpResponse> {
+    try {
+      await this.orderService.updateStatus(+id, updateOrderStatusDto);
+      return { isSuccess: true };
+    } catch (error) {
+      res.status(500);
+      return { isSuccess: false, error: error.message };
+    }
   }
 
   @Delete(':id')

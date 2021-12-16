@@ -98,8 +98,8 @@ export class StorageController {
   ): Promise<HttpResponse> {
     try {
       const data = await this.storageService.updateAmount(
-        +id,
         updateStorageDto,
+        +id,
       );
       return { isSuccess: true, data };
     } catch (error) {

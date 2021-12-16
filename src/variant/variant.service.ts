@@ -31,18 +31,25 @@ export class VariantService {
   //   return `This action updates a #${id} variant`;
   // }
 
-  async updateStock(id: number, amount: number): Promise<Variant> {
+  async updateStock(
+    id: number,
+    type: 'in' | 'out',
+    amount: number,
+  ): Promise<Variant> {
     const variant = await this.findOne(id);
-    variant.stock += amount;
+    if (type == 'in') {
+      variant.stock += amount;
+    } else {
+      variant.stock -= amount;
+      variant.out += amount;
+    }
     return await this.variantRepo.save(variant);
   }
 
-  async updateOut(id: number, amount: number): Promise<Variant> {
-    const variant = await this.findOne(id);
-    variant.out += amount;
-    variant.stock -= amount;
-    return await this.variantRepo.save(variant);
-  }
+  // async updateOut(id: number, amount: number): Promise<Variant> {
+  //   const variant = await this.findOne(id);
+  //   return await this.variantRepo.save(variant);
+  // }
 
   async remove(id: number): Promise<void> {
     await this.variantRepo.delete(id);

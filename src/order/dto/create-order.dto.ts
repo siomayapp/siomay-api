@@ -54,6 +54,7 @@ export class OrderVariantDto implements OrderVariant {
   pickedAmount: number;
 
   @ValidateNested()
+  @Type(() => OrderVariantStorageDto)
   @ValidateIf((object, value) => value !== null)
   pickedFrom: OrderVariantStorage[] | null;
 }
