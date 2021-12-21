@@ -93,7 +93,7 @@ export class OrderService {
     const newStatus =
       updateOrderStatusDto.statuses[updateOrderStatusDto.statuses.length - 1];
     if (newStatus.status == 'processing') {
-      await this.processOrder(updateOrderStatusDto.variants);
+      await this.processOrder(id, updateOrderStatusDto.variants);
     }
     const order = await this.orderRepo.preload({ id, ...updateOrderStatusDto });
     for (let i = 0; i < order.variants.length; i++) {
@@ -111,9 +111,12 @@ export class OrderService {
     });
   }
 
-  async processOrder(orderVariants: OrderVariantDto[]): Promise<void> {
-    orderVariants.forEach((variant) => {
-      variant.pickedFrom.forEach(async (storage) => {
+  async processOrder(
+    orderId: number,
+    orderVariants: OrderVariantDto[],
+  ): Promise<void> {
+    orderVariants.forEach(async (variant) => {
+      for (const storage of variant.pickedFrom) {
         await this.storageService.updateAmount(
           {
             amount: storage.pickedAmount,
@@ -121,8 +124,10 @@ export class OrderService {
           },
           undefined,
           storage.storage,
+          true,
+          orderId,
         );
-      });
+      }
     });
   }
 

@@ -6,4 +6,5 @@ export class CreateStorageTransactionDto {
   box: string;
   variant: string;
   amount: number;
+  orderId?: number;
 }

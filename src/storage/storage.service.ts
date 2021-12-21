@@ -1,9 +1,9 @@
-import { HttpException, HttpStatus, Injectable, Options } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
 import { IPagination } from '../shared/types';
 import { StorageTransactionService } from '../storage-transaction/storage-transaction.service';
-import { Variant } from '../variant/entities/variant.entity';
+// import { Variant } from '../variant/entities/variant.entity';
 import { VariantService } from '../variant/variant.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageAmountDto } from './dto/update-storage-amount.dto';
@@ -65,7 +65,7 @@ export class StorageService {
       const storage = await this.findOne(id);
       if (storage.variant != updateStorageDto.variant && storage.amount != 0) {
         throw new HttpException(
-          'Cannot update variant, because storage amout is not 0',
+          'Cannot update variant, because storage amount is not 0',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -78,6 +78,8 @@ export class StorageService {
     updateAmountDto: UpdateStorageAmountDto,
     id?: number,
     boxName?: string,
+    isProcessingOrder = false,
+    orderId?: number,
   ): Promise<Storage> {
     const storage = await this.findOne(id, boxName);
 
@@ -107,6 +109,7 @@ export class StorageService {
       box: storage.boxName,
       variant: relatedVariant.name,
       amount: updateAmountDto.amount,
+      orderId: isProcessingOrder ? orderId : undefined,
     });
 
     return await this.findOne(storage.id);
