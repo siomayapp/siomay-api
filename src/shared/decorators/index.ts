@@ -10,6 +10,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { UserRole } from '../../users/entities/users.role.enum';
+import { IPagination } from '../types';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
@@ -45,15 +46,15 @@ export const ApiFile = ({
 };
 
 export const Pagination = createParamDecorator(
-  (data, ctx: ExecutionContext) => {
+  (data, ctx: ExecutionContext): IPagination => {
     const req = ctx.switchToHttp().getRequest();
-    return { last: req.query.last, limit: req.query.limit };
+    return { page: +req.query.page, per_page: +req.query.per_page };
   },
 );
 
 export const Filter = createParamDecorator((data, ctx: ExecutionContext) => {
   const req = ctx.switchToHttp().getRequest();
-  delete req.query.last;
-  delete req.query.limit;
+  delete req.query.page;
+  delete req.query.per_page;
   return req.query;
 });

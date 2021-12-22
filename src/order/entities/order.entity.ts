@@ -35,8 +35,10 @@ export interface OrderVariant {
   pickedAmount: number;
 }
 
+export type OrderStatusName = 'incoming' | 'processing' | 'sending' | 'finish';
+
 export interface OrderStatus {
-  status: 'incoming' | 'processing' | 'sending' | 'finish';
+  status: OrderStatusName;
   statusDate: Date;
   actor: string;
   note: string | null;
@@ -77,6 +79,9 @@ export class Order {
 
   @Column({ type: 'json', nullable: true })
   statuses: OrderStatus[];
+
+  @Column({ nullable: true })
+  currentStatus: OrderStatusName;
 
   // when orderType = periodic
   @Column({ default: 0 })

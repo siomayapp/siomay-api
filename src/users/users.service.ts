@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Not, Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
+import { IPagination } from '../shared/types';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Users } from './entities/users.entity';
 import { UserRole } from './entities/users.role.enum';
@@ -11,17 +12,14 @@ export class UsersService {
     @InjectRepository(Users) private usersRepository: Repository<Users>,
   ) {}
 
-  async findAll(
-    lastId: number,
-    limit: number,
-  ): Promise<[Users[], number | null]> {
-    const users = await this.usersRepository.find({
-      where: { id: MoreThan(lastId), role: Not(UserRole.OWNER) },
-      take: limit,
+  async findAll(pagination: IPagination): Promise<[Users[], number]> {
+    const result = await this.usersRepository.findAndCount({
+      where: { role: Not(UserRole.OWNER) },
+      skip: (pagination.page - 1) * pagination.per_page,
+      take: pagination.per_page,
       order: { id: 'ASC' },
     });
-    const lastRowId = users.length > 0 ? users[users.length - 1].id : null;
-    return [users, lastRowId];
+    return result;
   }
 
   async findOne(id: number): Promise<Users> {

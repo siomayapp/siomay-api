@@ -31,8 +31,11 @@ export class StorageController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
+      const start = process.hrtime();
       const data = await this.storageService.createOne(createStorageDto);
-      return { isSuccess: true, data };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, data, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };
@@ -47,11 +50,14 @@ export class StorageController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
-      const [data, lastRowId] = await this.storageService.findAll(
+      const start = process.hrtime();
+      const [data, count] = await this.storageService.findAll(
         pagination,
         filter,
       );
-      return { isSuccess: true, data, lastRow: lastRowId };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, data, count, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };
@@ -65,8 +71,11 @@ export class StorageController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
+      const start = process.hrtime();
       const data = await this.storageService.findOne(+id);
-      return { isSuccess: true, data };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, data, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };
@@ -81,8 +90,11 @@ export class StorageController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
+      const start = process.hrtime();
       const data = await this.storageService.updateOne(+id, updateStorageDto);
-      return { isSuccess: true, data };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, data, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };
@@ -97,11 +109,14 @@ export class StorageController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
+      const start = process.hrtime();
       const data = await this.storageService.updateAmount(
         updateStorageDto,
         +id,
       );
-      return { isSuccess: true, data };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, data, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };
@@ -115,8 +130,11 @@ export class StorageController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
+      const start = process.hrtime();
       await this.storageService.remove(+id);
-      return { isSuccess: true };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };

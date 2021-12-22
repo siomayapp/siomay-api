@@ -11,7 +11,8 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { join } from 'path';
-import { Roles } from '../shared/decorators';
+import { Pagination, Roles } from '../shared/decorators';
+import { PaginationDto } from '../shared/dto';
 import { HttpResponse } from '../shared/types';
 import { UserRole } from './entities/users.role.enum';
 import { UsersService } from './users.service';
@@ -23,13 +24,15 @@ export class UsersController {
   @Get()
   @Roles(UserRole.OWNER)
   async getAllUsers(
-    @Query('last') last: string,
-    @Query('limit') limit: string,
+    @Pagination() pagination: PaginationDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
-      const [data, lastRow] = await this.usersService.findAll(+last, +limit);
-      return { isSuccess: true, data, lastRow };
+      const start = process.hrtime();
+      const [data, count] = await this.usersService.findAll(pagination);
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, data, count, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };
@@ -43,8 +46,11 @@ export class UsersController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
+      const start = process.hrtime();
       const data = await this.usersService.findOne(+id);
-      return { isSuccess: true, data };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, data, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };
@@ -59,8 +65,11 @@ export class UsersController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<any> {
     try {
+      const start = process.hrtime();
       const data = await this.usersService.updateOne(+id, updateUserData);
-      return { isSuccess: true, data };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, data, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };
@@ -74,8 +83,11 @@ export class UsersController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<any> {
     try {
+      const start = process.hrtime();
       this.usersService.remove(+id);
-      return { isSuccess: true };
+      const end = process.hrtime(start);
+      const exec_time = end[0] * 1000 + end[1] / 1000000;
+      return { isSuccess: true, exec_time };
     } catch (error) {
       res.status(500);
       return { isSuccess: false, error: error.message };

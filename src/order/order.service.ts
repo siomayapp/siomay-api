@@ -5,10 +5,11 @@ import { OrderHistoryService } from '../order-history/order-history.service';
 import { VariantService } from '../variant/variant.service';
 import { CreateOrderDto, OrderVariantDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { Order } from './entities/order.entity';
+import { Order, OrderType } from './entities/order.entity';
 import * as crypto from 'crypto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { StorageService } from '../storage/storage.service';
+import { IPagination } from '../shared/types';
 
 @Injectable()
 export class OrderService {
@@ -26,11 +27,19 @@ export class OrderService {
       createOrderDto.orderType,
       initStatus.statusDate,
     );
+
     const order = await this.orderRepo.create({
       ...createOrderDto,
       statuses: createOrderDto.statuses,
       orderNumber: orderNumber,
     });
+
+    // if (order.orderType == OrderType.PERIODIC) {
+    //   order.nextDeliveryDate = new Date().setDate(
+    //     order.deliveryDate.getDate() + order.deliveryFreq,
+    //   );
+    // }
+
     for (let i = 0; i < order.variants.length; i++) {
       const dataVariant = order.variants[i];
       const loadedVariant = await this.variantService.findOne(
@@ -47,16 +56,19 @@ export class OrderService {
     return order;
   }
 
-  async findAll(
-    lastId: number,
-    limit: number,
-  ): Promise<[Order[], number | null]> {
-    const orders = await this.orderRepo.find({
-      where: { id: MoreThan(lastId) },
-      take: limit,
-    });
-    const lastRow = orders.length > 0 ? orders[orders.length - 1].id : null;
-    return [orders, lastRow];
+  async findAll(pagination: IPagination): Promise<[Order[], number]> {
+    // const result = await this.orderRepo.findAndCount({
+    //   skip: (pagination.page - 1) * pagination.per_page,
+    //   take: pagination.per_page,
+    //   order: { deliveryDate: 'ASC', id: 'ASC' },
+    // });
+    const result = await this.orderRepo
+      .createQueryBuilder('order')
+      .skip((pagination.page - 1) * pagination.per_page)
+      .limit(pagination.per_page)
+      .orderBy({ 'order.deliveryDate': 'ASC' })
+      .getManyAndCount();
+    return result;
   }
 
   async findOne(id: number): Promise<Order> {
@@ -95,6 +107,7 @@ export class OrderService {
     if (newStatus.status == 'processing') {
       await this.processOrder(id, updateOrderStatusDto.variants);
     }
+
     const order = await this.orderRepo.preload({ id, ...updateOrderStatusDto });
     for (let i = 0; i < order.variants.length; i++) {
       const dataVariant = order.variants[i];
@@ -104,6 +117,13 @@ export class OrderService {
       );
       order.variants[i].variant = loadedVariant;
     }
+
+    if (newStatus.status == 'finish' && order.orderType == OrderType.PERIODIC) {
+      order.cycle += 1;
+      order.lastCycle = newStatus.statusDate;
+      // reset statusnya gimana?
+    }
+
     await this.orderRepo.save(order);
     await this.orderHistoryService.create({
       order: order,

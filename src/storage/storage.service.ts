@@ -41,14 +41,14 @@ export class StorageService {
   async findAll(
     pagination: IPagination,
     filter: IFilterStorage,
-  ): Promise<[Storage[], number | null]> {
-    const storages = await this.storageRepo.find({
-      where: { id: MoreThan(pagination.last), ...filter },
-      take: pagination.limit,
+  ): Promise<[Storage[], number]> {
+    const result = await this.storageRepo.findAndCount({
+      where: { ...filter },
+      skip: (pagination.page - 1) * pagination.per_page,
+      take: pagination.per_page,
+      order: { id: 'ASC' },
     });
-    const lastRow =
-      storages.length > 0 ? storages[storages.length - 1].id : null;
-    return [storages, lastRow];
+    return result;
   }
 
   async findOne(id?: number, boxName?: string): Promise<Storage> {

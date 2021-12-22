@@ -3,8 +3,8 @@ import { IPagination } from '../types';
 
 export class PaginationDto implements IPagination {
   @IsNumberString()
-  last: number;
+  page: number;
 
   @IsNumberString()
-  limit: number;
+  per_page: number;
 }

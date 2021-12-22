@@ -1,11 +1,12 @@
 export interface HttpResponse {
   isSuccess: boolean;
   data?: any[] | any;
-  lastRow?: number | null;
+  count?: number | null;
+  exec_time?: number;
   error?: any;
 }
 
 export interface IPagination {
-  last: number;
-  limit: number;
+  page: number;
+  per_page: number;
 }
