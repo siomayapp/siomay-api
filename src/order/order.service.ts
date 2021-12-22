@@ -60,12 +60,12 @@ export class OrderService {
     // const result = await this.orderRepo.findAndCount({
     //   skip: (pagination.page - 1) * pagination.per_page,
     //   take: pagination.per_page,
-    //   order: { deliveryDate: 'ASC', id: 'ASC' },
+    //   order: { deliveryDate: 'ASC' },
     // });
     const result = await this.orderRepo
       .createQueryBuilder('order')
       .skip((pagination.page - 1) * pagination.per_page)
-      .limit(pagination.per_page)
+      .take(pagination.per_page)
       .orderBy({ 'order.deliveryDate': 'ASC' })
       .getManyAndCount();
     return result;
