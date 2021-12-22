@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { OrderHistoryService } from '../order-history/order-history.service';
 import { VariantService } from '../variant/variant.service';
 import { CreateOrderDto, OrderVariantDto } from './dto/create-order.dto';

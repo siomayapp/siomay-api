@@ -16,6 +16,7 @@ import { VariantModule } from './variant/variant.module';
 import { StorageTransactionModule } from './storage-transaction/storage-transaction.module';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { OrderHistoryModule } from './order-history/order-history.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 const dbConfig = herokuDb; //devDb
 
@@ -39,6 +40,7 @@ const dbConfig = herokuDb; //devDb
     StorageTransactionModule,
     OrderModule,
     OrderHistoryModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [
