@@ -67,7 +67,15 @@ export class OrderService {
       .createQueryBuilder('order')
       .skip((pagination.page - 1) * pagination.per_page)
       .take(pagination.per_page)
-      .orderBy({ 'order.deliveryDate': 'ASC' })
+      .orderBy(
+        `case order.currentStatus
+          when 'incoming' then 0
+          when 'processing' then 1
+          when 'sending' then 2
+          else 3
+        end`,
+      )
+      .addOrderBy('order.deliveryDate', 'ASC')
       .getManyAndCount();
     return result;
   }
