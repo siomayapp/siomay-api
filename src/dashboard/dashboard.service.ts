@@ -44,6 +44,14 @@ export class DashboardService {
     // return await this.variantRepo.find({ select: ['id', 'name', 'out'] });
   }
 
+  async getTotalStock(): Promise<number> {
+    const { stock } = await this.variantRepo
+      .createQueryBuilder(`va`)
+      .select(`sum(va.stock)`, `stock`)
+      .getRawOne();
+    return parseInt(stock);
+  }
+
   async getTodayOrderList(): Promise<Order[]> {
     const today = new Date().toLocaleString('sv').slice(0, 10);
     return await this.orderRepo
