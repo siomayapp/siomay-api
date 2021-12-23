@@ -31,7 +31,17 @@ export class DashboardService {
   }
 
   async getSoldVariant(): Promise<Variant[]> {
-    return await this.variantRepo.find({ select: ['id', 'name', 'out'] });
+    const result = await this.stRepo
+      .createQueryBuilder(`st`)
+      .leftJoinAndSelect(Order, `ord`, `ord.id = st.orderId`)
+      .leftJoinAndSelect(Variant, `va`, `va.name = st.variant`)
+      .select(`va.name, sum(st.amount) as out`)
+      .where(`st.type = 'out' and ord.currentStatus = 'finish'`)
+      .groupBy(`va.name`)
+      .getRawMany();
+
+    return result as Variant[];
+    // return await this.variantRepo.find({ select: ['id', 'name', 'out'] });
   }
 
   async getTodayOrderList(): Promise<Order[]> {
