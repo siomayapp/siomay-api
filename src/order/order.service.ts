@@ -32,6 +32,7 @@ export class OrderService {
       ...createOrderDto,
       statuses: createOrderDto.statuses,
       orderNumber: orderNumber,
+      currentStatus: initStatus.status,
     });
 
     // if (order.orderType == OrderType.PERIODIC) {
@@ -109,6 +110,7 @@ export class OrderService {
     }
 
     const order = await this.orderRepo.preload({ id, ...updateOrderStatusDto });
+    order.currentStatus = newStatus.status;
     for (let i = 0; i < order.variants.length; i++) {
       const dataVariant = order.variants[i];
       const loadedVariant = await this.variantService.findOne(
