@@ -7,6 +7,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { Users } from '../../users/entities/users.entity';
 import { Variant } from '../../variant/entities/variant.entity';
 import {
   OrderStatus,
@@ -84,8 +85,13 @@ export class CreateOrderDto {
   @IsNumber()
   deliveryFreq: number;
 
+  @IsNumber()
+  @ValidateIf((object, value) => value !== null)
+  distributor?: Users | null;
+
   @IsString()
-  customer: string;
+  @ValidateIf((object, value) => value !== null)
+  customer?: string | null;
 
   @IsString()
   address: string;

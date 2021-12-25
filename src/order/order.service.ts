@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 import { OrderHistoryService } from '../order-history/order-history.service';
 import { VariantService } from '../variant/variant.service';
 import { CreateOrderDto, OrderVariantDto } from './dto/create-order.dto';
@@ -21,6 +21,21 @@ export class OrderService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    if (
+      createOrderDto.orderType == OrderType.PERIODIC &&
+      (createOrderDto.distributor == undefined ||
+        createOrderDto.distributor == null)
+    ) {
+      throw new HttpException('Bad Request', 400);
+    }
+
+    if (
+      createOrderDto.orderType == OrderType.DIRECT &&
+      (createOrderDto.customer == undefined || createOrderDto.customer == null)
+    ) {
+      throw new HttpException('Bad Request', 400);
+    }
+
     const initStatus =
       createOrderDto.statuses[createOrderDto.statuses.length - 1];
     const orderNumber = this.generateOrderNumber(
@@ -63,21 +78,47 @@ export class OrderService {
     //   take: pagination.per_page,
     //   order: { deliveryDate: 'ASC' },
     // });
-    const result = await this.orderRepo
-      .createQueryBuilder('order')
-      .skip((pagination.page - 1) * pagination.per_page)
-      .take(pagination.per_page)
-      .orderBy(
-        `case order.currentStatus
-          when 'incoming' then 0
-          when 'processing' then 1
-          when 'sending' then 2
-          else 3
-        end`,
-      )
-      .addOrderBy('order.deliveryDate', 'ASC')
-      .getManyAndCount();
-    return result;
+
+    // const result = await this.orderRepo
+    //   .createQueryBuilder('order')
+    //   .leftJoinAndSelect('order.distributor', 'distributor')
+    //   .skip((pagination.page - 1) * pagination.per_page)
+    //   .take(pagination.per_page)
+    //   .orderBy(
+    //     `case order.currentStatus
+    //       when 'incoming' then 0
+    //       when 'processing' then 1
+    //       when 'sending' then 2
+    //       else 3
+    //     end`,
+    //   )
+    //   .addOrderBy('order.deliveryDate', 'ASC')
+    //   .getManyAndCount();
+
+    const data = await getManager().query(
+      `
+      select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."lastCycle", ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
+        (select row_to_json(us) 
+            from (select id, name, role, username 
+              from public.users 
+              where users.id = ord."distributorId") as us
+        ) as distributor
+      from public.order ord
+      order by case ord."currentStatus"
+        when 'incoming' then 0
+        when 'processing' then 1
+        when 'sending' then 2
+        else 3
+      end, ord."deliveryDate" ASC
+      limit $1
+      offset $2
+    `,
+      [pagination.per_page, (pagination.page - 1) * pagination.per_page],
+    );
+
+    const count = await this.orderRepo.count();
+
+    return [data as Order[], count];
   }
 
   async findOne(id: number): Promise<Order> {

@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Users } from '../../users/entities/users.entity';
 import { Variant } from '../../variant/entities/variant.entity';
 
 export enum OrderType {
@@ -68,8 +70,16 @@ export class Order {
   @Column({ type: 'timestamp with time zone', nullable: true })
   nextDeliveryDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   customer: string;
+
+  // @Column({ nullable: true })
+  @ManyToOne(() => Users, (user) => user.username, {
+    nullable: true,
+    onDelete: 'NO ACTION',
+    eager: true,
+  })
+  distributor: Users;
 
   @Column()
   address: string;
