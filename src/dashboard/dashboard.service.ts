@@ -35,7 +35,7 @@ export class DashboardService {
       .createQueryBuilder(`st`)
       .leftJoinAndSelect(Order, `ord`, `ord.id = st.orderId`)
       .leftJoinAndSelect(Variant, `va`, `va.name = st.variant`)
-      .select(`va.name, sum(st.amount) as out`)
+      .select(`va.name, sum(st.amount)::int as out`)
       .where(`st.type = 'out' and ord.currentStatus = 'finish'`)
       .groupBy(`va.name`)
       .getRawMany();
