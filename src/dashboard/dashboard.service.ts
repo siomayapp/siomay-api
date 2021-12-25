@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getManager, Repository } from 'typeorm';
 import { Order } from '../order/entities/order.entity';
 import { StorageTransaction } from '../storage-transaction/entities/storage-transaction.entity';
 import { Variant } from '../variant/entities/variant.entity';
@@ -54,10 +54,18 @@ export class DashboardService {
 
   async getTodayOrderList(): Promise<Order[]> {
     const today = new Date().toLocaleString('sv').slice(0, 10);
-    return await this.orderRepo
-      .createQueryBuilder('order')
-      .where('date("deliveryDate") = :today', { today: today })
-      .orderBy({ 'order.deliveryDate': 'ASC' })
-      .getMany();
+    const data = await getManager().query(
+      `select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."lastCycle", ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
+        (select row_to_json(us) 
+            from (select id, name, role, username 
+              from public.users 
+              where users.id = ord."distributorId") as us
+        ) as distributor
+      from public.order ord
+      where date("deliveryDate") = $1
+      order by ord."deliveryDate" ASC`,
+      [today],
+    );
+    return data as Order[];
   }
 }
