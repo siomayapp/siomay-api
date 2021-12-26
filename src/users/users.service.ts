@@ -5,6 +5,7 @@ import { IPagination } from '../shared/types';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Users } from './entities/users.entity';
 import { UserRole } from './entities/users.role.enum';
+import { IFilterUser } from './types';
 
 @Injectable()
 export class UsersService {
@@ -12,9 +13,12 @@ export class UsersService {
     @InjectRepository(Users) private usersRepository: Repository<Users>,
   ) {}
 
-  async findAll(pagination: IPagination): Promise<[Users[], number]> {
+  async findAll(
+    pagination: IPagination,
+    filter: IFilterUser,
+  ): Promise<[Users[], number]> {
     const result = await this.usersRepository.findAndCount({
-      where: { role: Not(UserRole.OWNER) },
+      where: { role: Not(UserRole.OWNER), ...filter },
       skip: (pagination.page - 1) * pagination.per_page,
       take: pagination.per_page,
       order: { id: 'ASC' },

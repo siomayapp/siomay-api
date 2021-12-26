@@ -11,9 +11,10 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { join } from 'path';
-import { Pagination, Roles } from '../shared/decorators';
+import { Filter, Pagination, Roles } from '../shared/decorators';
 import { PaginationDto } from '../shared/dto';
 import { HttpResponse } from '../shared/types';
+import { FilterUserDto } from './dto/request-query.dto';
 import { UserRole } from './entities/users.role.enum';
 import { UsersService } from './users.service';
 
@@ -24,12 +25,13 @@ export class UsersController {
   @Get()
   @Roles(UserRole.OWNER)
   async getAllUsers(
+    @Filter() filter: FilterUserDto,
     @Pagination() pagination: PaginationDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
       const start = process.hrtime();
-      const [data, count] = await this.usersService.findAll(pagination);
+      const [data, count] = await this.usersService.findAll(pagination, filter);
       const end = process.hrtime(start);
       const exec_time = end[0] * 1000 + end[1] / 1000000;
       return { isSuccess: true, data, count, exec_time };
