@@ -43,18 +43,18 @@ export class OrderService {
       initStatus.statusDate,
     );
 
+    // if (order.orderType == OrderType.PERIODIC) {
+    //   order.nextDeliveryDate = new Date().setDate(
+    //     order.deliveryDate.getDate() + order.deliveryFreq,
+    //   );
+    // }
+
     const order = await this.orderRepo.create({
       ...createOrderDto,
       statuses: createOrderDto.statuses,
       orderNumber: orderNumber,
       currentStatus: initStatus.status,
     });
-
-    // if (order.orderType == OrderType.PERIODIC) {
-    //   order.nextDeliveryDate = new Date().setDate(
-    //     order.deliveryDate.getDate() + order.deliveryFreq,
-    //   );
-    // }
 
     for (let i = 0; i < order.variants.length; i++) {
       const dataVariant = order.variants[i];
@@ -69,7 +69,7 @@ export class OrderService {
       orderStatus: initStatus,
     });
 
-    return order;
+    return await this.orderRepo.preload(order);
   }
 
   async findAll(pagination: IPagination): Promise<[Order[], number]> {
