@@ -60,7 +60,7 @@ export class OrderController {
   }
 
   @Get(':id')
-  @Roles(UserRole.OWNER, UserRole.DISTRIBUTION)
+  @Roles(UserRole.OWNER, UserRole.DISTRIBUTION, UserRole.DISTRIBUTOR)
   async findOne(
     @Param('id') id: string,
     @Res({ passthrough: true }) res: Response,
