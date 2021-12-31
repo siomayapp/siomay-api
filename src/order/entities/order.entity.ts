@@ -97,9 +97,6 @@ export class Order {
   @Column({ default: 0 })
   cycle: number; //
 
-  @Column({ nullable: true })
-  lastCycle: Date;
-
   @Column()
   @CreateDateColumn()
   createdDate: Date;

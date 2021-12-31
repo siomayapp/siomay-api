@@ -21,6 +21,10 @@ export class OrderHistory {
   @Column('simple-json')
   orderStatus: OrderStatus;
 
+  // when orderType = periodic
+  @Column({ default: 0 })
+  cycle: number; //
+
   @Column()
   @CreateDateColumn()
   createdDate: Date;

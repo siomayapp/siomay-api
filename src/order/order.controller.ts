@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   Res,
-  Query,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -87,7 +86,7 @@ export class OrderController {
   }
 
   @Patch('update-status/:id')
-  @Roles(UserRole.OWNER, UserRole.DISTRIBUTION)
+  @Roles(UserRole.OWNER, UserRole.DISTRIBUTION, UserRole.DISTRIBUTOR)
   async updateStatus(
     @Param('id') id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,

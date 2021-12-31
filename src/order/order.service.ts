@@ -10,6 +10,7 @@ import * as crypto from 'crypto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { StorageService } from '../storage/storage.service';
 import { IPagination } from '../shared/types';
+import { lastOfArray } from '../shared/utils';
 
 @Injectable()
 export class OrderService {
@@ -36,24 +37,27 @@ export class OrderService {
       throw new HttpException('Bad Request', 400);
     }
 
-    const initStatus =
-      createOrderDto.statuses[createOrderDto.statuses.length - 1];
+    const initStatus = lastOfArray(createOrderDto.statuses);
     const orderNumber = this.generateOrderNumber(
       createOrderDto.orderType,
       initStatus.statusDate,
     );
 
-    // if (order.orderType == OrderType.PERIODIC) {
-    //   order.nextDeliveryDate = new Date().setDate(
-    //     order.deliveryDate.getDate() + order.deliveryFreq,
-    //   );
-    // }
+    let nextDeliveryDate: Date | undefined;
+    if (createOrderDto.orderType == OrderType.PERIODIC) {
+      nextDeliveryDate = new Date(createOrderDto.deliveryDate);
+      nextDeliveryDate.setDate(
+        nextDeliveryDate.getDate() + createOrderDto.deliveryFreq,
+      );
+    }
 
-    const order = await this.orderRepo.create({
+    const order = this.orderRepo.create({
       ...createOrderDto,
       statuses: createOrderDto.statuses,
       orderNumber: orderNumber,
       currentStatus: initStatus.status,
+      nextDeliveryDate: nextDeliveryDate,
+      cycle: createOrderDto.orderType == OrderType.PERIODIC ? 1 : 0,
     });
 
     for (let i = 0; i < order.variants.length; i++) {
@@ -67,6 +71,7 @@ export class OrderService {
     await this.orderHistoryService.create({
       order: order,
       orderStatus: initStatus,
+      cycle: order.cycle,
     });
 
     return await this.orderRepo.preload(order);
@@ -152,8 +157,7 @@ export class OrderService {
     id: number,
     updateOrderStatusDto: UpdateOrderStatusDto,
   ): Promise<void> {
-    const newStatus =
-      updateOrderStatusDto.statuses[updateOrderStatusDto.statuses.length - 1];
+    const newStatus = lastOfArray(updateOrderStatusDto.statuses);
     if (newStatus.status == 'processing') {
       await this.processOrder(id, updateOrderStatusDto.variants);
     }
@@ -169,16 +173,39 @@ export class OrderService {
       order.variants[i].variant = loadedVariant;
     }
 
-    if (newStatus.status == 'finish' && order.orderType == OrderType.PERIODIC) {
-      order.cycle += 1;
-      order.lastCycle = newStatus.statusDate;
-      // reset statusnya gimana?
-    }
-
     await this.orderRepo.save(order);
     await this.orderHistoryService.create({
       order: order,
       orderStatus: newStatus,
+      cycle: order.cycle,
+    });
+
+    if (newStatus.status == 'finish' && order.orderType == OrderType.PERIODIC) {
+      await this.resetOrder(order);
+    }
+  }
+
+  async resetOrder(order: Order): Promise<void> {
+    order.statuses = [
+      {
+        actor: 'system',
+        note: null,
+        status: 'incoming',
+        statusDate: new Date(),
+      },
+    ];
+    order.currentStatus = 'incoming';
+    order.cycle += 1;
+    order.deliveryDate = order.nextDeliveryDate;
+    order.nextDeliveryDate = new Date(order.deliveryDate);
+    order.nextDeliveryDate.setDate(
+      order.nextDeliveryDate.getDate() + order.deliveryFreq,
+    );
+    await this.orderRepo.save(order);
+    await this.orderHistoryService.create({
+      order: order,
+      orderStatus: lastOfArray(order.statuses),
+      cycle: order.cycle,
     });
   }
 
