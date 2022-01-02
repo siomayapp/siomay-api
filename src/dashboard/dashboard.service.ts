@@ -55,7 +55,7 @@ export class DashboardService {
   async getTodayOrderList(): Promise<Order[]> {
     const today = new Date().toLocaleString('sv').slice(0, 10);
     const data = await getManager().query(
-      `select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."lastCycle", ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
+      `select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
         (select row_to_json(us) 
             from (select id, name, role, username 
               from public.users 
