@@ -77,20 +77,20 @@ export class DashboardController {
     }
   }
 
-  @Get('get-today-orders')
-  @Roles(UserRole.OWNER)
-  async getTodayOrderList(
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<HttpResponse> {
-    try {
-      const start = process.hrtime();
-      const data = await this.dashboardService.getTodayOrderList();
-      const end = process.hrtime(start);
-      const exec_time = end[0] * 1000 + end[1] / 1000000;
-      return { isSuccess: true, data, exec_time };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
-  }
+  // @Get('get-today-orders')
+  // @Roles(UserRole.OWNER)
+  // async getTodayOrderList(
+  //   @Res({ passthrough: true }) res: Response,
+  // ): Promise<HttpResponse> {
+  //   try {
+  //     const start = process.hrtime();
+  //     const data = await this.dashboardService.getTodayOrderList();
+  //     const end = process.hrtime(start);
+  //     const exec_time = end[0] * 1000 + end[1] / 1000000;
+  //     return { isSuccess: true, data, exec_time };
+  //   } catch (error) {
+  //     res.status(500);
+  //     return { isSuccess: false, error: error.message };
+  //   }
+  // }
 }

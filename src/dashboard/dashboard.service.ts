@@ -52,20 +52,20 @@ export class DashboardService {
     return parseInt(stock);
   }
 
-  async getTodayOrderList(): Promise<Order[]> {
-    const today = new Date().toLocaleString('sv').slice(0, 10);
-    const data = await getManager().query(
-      `select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
-        (select row_to_json(us) 
-            from (select id, name, role, username 
-              from public.users 
-              where users.id = ord."distributorId") as us
-        ) as distributor
-      from public.order ord
-      where date("deliveryDate") = $1
-      order by ord."deliveryDate" ASC`,
-      [today],
-    );
-    return data as Order[];
-  }
+  // async getTodayOrderList(): Promise<Order[]> {
+  //   const today = new Date().toLocaleString('sv').slice(0, 10);
+  //   const data = await getManager().query(
+  //     `select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
+  //       (select row_to_json(us)
+  //           from (select id, name, role, username
+  //             from public.users
+  //             where users.id = ord."distributorId") as us
+  //       ) as distributor
+  //     from public.order ord
+  //     where date("deliveryDate") = $1
+  //     order by ord."deliveryDate" ASC`,
+  //     [today],
+  //   );
+  //   return data as Order[];
+  // }
 }
