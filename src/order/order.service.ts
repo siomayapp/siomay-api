@@ -250,7 +250,7 @@ export class OrderService {
 
   private generateFilterQuery(filter: IFilterOrder): string {
     let query = '1=1';
-    if (filter.status != undefined) {
+    if (filter.status != undefined && filter.status != '') {
       const statusesArray = filter.status.split(',');
       let statusesString = '';
       for (const status of statusesArray) {
@@ -259,8 +259,8 @@ export class OrderService {
       query += ` and ord."currentStatus" in (${statusesString.slice(0, -1)})`;
     }
 
-    if (filter.startDate != undefined) {
-      if (filter.endDate == undefined) {
+    if (filter.startDate != undefined && filter.startDate != '') {
+      if (filter.endDate == undefined || filter.endDate == '') {
         const endDate = new Date(filter.startDate);
         endDate.setDate(endDate.getDate() + 1);
         filter.endDate = endDate.toISOString().substring(0, 10);
@@ -268,7 +268,7 @@ export class OrderService {
       query += ` and ord."deliveryDate" >= '${filter.startDate}' and ord."deliveryDate" < '${filter.endDate}'`;
     }
 
-    if (filter.orderType != undefined) {
+    if (filter.orderType != undefined && filter.orderType != '') {
       query += ` and ord."orderType" = '${filter.orderType}'`;
     }
     return query;
