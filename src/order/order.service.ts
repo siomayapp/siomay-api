@@ -11,6 +11,7 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { StorageService } from '../storage/storage.service';
 import { IPagination } from '../shared/types';
 import { lastOfArray } from '../shared/utils';
+import { IFilterOrder } from './types';
 
 @Injectable()
 export class OrderService {
@@ -77,7 +78,10 @@ export class OrderService {
     return await this.orderRepo.preload(order);
   }
 
-  async findAll(pagination: IPagination): Promise<[Order[], number]> {
+  async findAll(
+    pagination: IPagination,
+    filter: IFilterOrder,
+  ): Promise<[Order[], number]> {
     // const result = await this.orderRepo.findAndCount({
     //   skip: (pagination.page - 1) * pagination.per_page,
     //   take: pagination.per_page,
@@ -100,8 +104,8 @@ export class OrderService {
     //   .addOrderBy('order.deliveryDate', 'ASC')
     //   .getManyAndCount();
 
-    const data = await getManager().query(
-      `
+    const filterQuery = this.generateFilterQuery(filter);
+    const data = await getManager().query(`
       select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
         (select row_to_json(us) 
             from (select id, name, role, username 
@@ -109,21 +113,22 @@ export class OrderService {
               where users.id = ord."distributorId") as us
         ) as distributor
       from public.order ord
+      where ${filterQuery}
       order by case ord."currentStatus"
         when 'incoming' then 0
         when 'processing' then 1
         when 'sending' then 2
         else 3
       end, ord."deliveryDate" ASC
-      limit $1
-      offset $2
-    `,
-      [pagination.per_page, (pagination.page - 1) * pagination.per_page],
-    );
+      limit ${pagination.per_page}
+      offset ${(pagination.page - 1) * pagination.per_page}
+    `);
 
-    const count = await this.orderRepo.count();
+    const count = await getManager().query(`
+      select count(*) from public.order ord where ${filterQuery}
+    `);
 
-    return [data as Order[], count];
+    return [data as Order[], count[0].count];
   }
 
   async findOne(id: number): Promise<Order> {
@@ -229,7 +234,10 @@ export class OrderService {
     });
   }
 
-  generateOrderNumber(orderType: string, initialStatusDate: Date): string {
+  private generateOrderNumber(
+    orderType: string,
+    initialStatusDate: Date,
+  ): string {
     const firstPart = orderType == 'periodic' ? 'PER' : 'DIR';
     const newDate = new Date(initialStatusDate);
     const secondPart = `${newDate.getFullYear()}${
@@ -238,5 +246,31 @@ export class OrderService {
     const thirdPart = crypto.randomBytes(6).toString('base64');
     return [firstPart, secondPart, thirdPart].join('/');
     // return Buffer.from(str, 'binary').toString('base64');
+  }
+
+  private generateFilterQuery(filter: IFilterOrder): string {
+    let query = '1=1';
+    if (filter.status != undefined) {
+      const statusesArray = filter.status.split(',');
+      let statusesString = '';
+      for (const status of statusesArray) {
+        statusesString += `'${status}',`;
+      }
+      query += ` and ord."currentStatus" in (${statusesString.slice(0, -1)})`;
+    }
+
+    if (filter.startDate != undefined) {
+      if (filter.endDate == undefined) {
+        const endDate = new Date(filter.startDate);
+        endDate.setDate(endDate.getDate() + 1);
+        filter.endDate = endDate.toISOString().substring(0, 10);
+      }
+      query += ` and ord."deliveryDate" >= '${filter.startDate}' and ord."deliveryDate" < '${filter.endDate}'`;
+    }
+
+    if (filter.orderType != undefined) {
+      query += ` and ord."orderType" = '${filter.orderType}'`;
+    }
+    return query;
   }
 }

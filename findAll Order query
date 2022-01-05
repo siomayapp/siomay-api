@@ -1,0 +1,19 @@
+select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
+        (select row_to_json(us) 
+            from (select id, name, role, username 
+              from public.users 
+              where users.id = ord."distributorId") as us
+        ) as distributor
+      from public.order ord
+	  where 1=1
+		and ord."currentStatus" in ('incoming','processing')
+		and ord."deliveryDate" >= '2022-01-05' and ord."deliveryDate" < '2022-01-06'
+		and ord."orderType" = 'periodic'
+      order by case ord."currentStatus"
+        when 'incoming' then 0
+        when 'processing' then 1
+        when 'sending' then 2
+        else 3
+      end, ord."deliveryDate" ASC
+      limit 10
+      offset 0

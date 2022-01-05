@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   Res,
 } from '@nestjs/common';
 import { StorageService } from './storage.service';
@@ -17,7 +16,7 @@ import { UserRole } from 'src/users/entities/users.role.enum';
 import { UpdateStorageAmountDto } from './dto/update-storage-amount.dto';
 import { HttpResponse } from '../shared/types';
 import { Response } from 'express';
-import { FilterStorageDto } from './dto/request-query.dto';
+import { FilterStorageDto } from './dto/filter-storage.dto';
 import { PaginationDto } from '../shared/dto';
 
 @Controller('storage')
