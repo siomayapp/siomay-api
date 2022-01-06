@@ -37,7 +37,7 @@ export class Users {
   })
   salt: string;
 
-  @Column({ nullable: true })
+  @Column({ unique: true, nullable: true })
   phone: string | null;
 
   @Column({ nullable: true })
