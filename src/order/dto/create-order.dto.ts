@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsDateString,
   IsNumber,
+  IsPhoneNumber,
   IsString,
   ValidateIf,
   ValidateNested,
@@ -93,8 +94,13 @@ export class CreateOrderDto {
   @ValidateIf((object, value) => value !== null)
   customer?: string | null;
 
+  @IsPhoneNumber('ID')
+  @ValidateIf((object, value) => value !== null)
+  phone?: string | null;
+
   @IsString()
-  address: string;
+  @ValidateIf((object, value) => value !== null)
+  address?: string | null;
 
   @ValidateNested()
   @Type(() => OrderVariantDto)

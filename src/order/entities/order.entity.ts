@@ -81,7 +81,10 @@ export class Order {
   })
   distributor: Users;
 
-  @Column()
+  @Column({ default: null, nullable: true })
+  phone: string;
+
+  @Column({ default: null, nullable: true })
   address: string;
 
   @Column({ type: 'json' })
