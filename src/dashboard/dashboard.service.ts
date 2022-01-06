@@ -27,7 +27,7 @@ export class DashboardService {
       .select(`sum(st.amount)`, `sold`)
       .where(`st.type = 'out' and ord.currentStatus = 'finish'`)
       .getRawOne();
-    return parseInt(sold);
+    return parseInt(sold == null ? 0 : sold);
   }
 
   async getSoldVariant(): Promise<Variant[]> {
