@@ -18,7 +18,7 @@ export class UsersService {
     filter: IFilterUser,
   ): Promise<[Users[], number]> {
     const result = await this.usersRepository.findAndCount({
-      where: { role: Not(UserRole.OWNER), ...filter },
+      where: { role: Not(UserRole.OWNER), isDeleted: false, ...filter },
       skip: (pagination.page - 1) * pagination.per_page,
       take: pagination.per_page,
       order: { id: 'ASC' },
@@ -56,6 +56,6 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
+    await this.usersRepository.save({ id: id, isDeleted: true });
   }
 }

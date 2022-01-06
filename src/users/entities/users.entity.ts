@@ -63,6 +63,9 @@ export class Users {
   @Column({ type: 'boolean', default: false })
   isPwdChanged: boolean;
 
-  @Column({ default: true })
+  @Column({ default: false })
   isActive: boolean;
+
+  @Column({ default: false })
+  isDeleted: boolean;
 }
