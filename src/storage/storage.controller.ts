@@ -42,7 +42,7 @@ export class StorageController {
   }
 
   @Get()
-  @Roles(UserRole.OWNER, UserRole.STORAGE)
+  @Roles(UserRole.OWNER, UserRole.STORAGE, UserRole.DISTRIBUTION)
   async findAll(
     @Filter() filter: FilterStorageDto,
     @Pagination() pagination: PaginationDto,
