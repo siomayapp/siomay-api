@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Param,
   Patch,
-  Query,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -23,7 +22,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @Roles(UserRole.OWNER)
+  @Roles(UserRole.OWNER, UserRole.DISTRIBUTION)
   async getAllUsers(
     @Filter() filter: FilterUserDto,
     @Pagination() pagination: PaginationDto,
