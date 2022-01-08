@@ -1,15 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { IPagination } from '../shared/types';
 import { StorageTransactionService } from '../storage-transaction/storage-transaction.service';
 // import { Variant } from '../variant/entities/variant.entity';
 import { VariantService } from '../variant/variant.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
-import { UpdateStorageAmountDto } from './dto/update-storage-amount.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
 import { Storage } from './entities/storage.entity';
-import { IFilterStorage } from './types';
+import { IFilterStorage, IUpdateAmountParams } from './types';
 
 @Injectable()
 export class StorageService {
@@ -61,34 +60,58 @@ export class StorageService {
     id: number,
     updateStorageDto: UpdateStorageDto,
   ): Promise<Storage> {
-    if (updateStorageDto.variant) {
-      const storage = await this.findOne(id);
-      if (storage.variant != updateStorageDto.variant && storage.amount != 0) {
-        throw new HttpException(
-          'Cannot update variant, because storage amount is not 0',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+    if (updateStorageDto == undefined || updateStorageDto.amount == 0) {
+      throw new HttpException(
+        'Jumlah tidak boleh kosong',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    return await this.storageRepo.save({ id: id, ...updateStorageDto });
+    const storage = await this.findOne(id);
+    if (storage.amount != 0) {
+      throw new HttpException(
+        'Tidak dapat update storage, karena storage tidak kosong',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (
+      updateStorageDto.variant != undefined &&
+      +updateStorageDto.variant != storage.variant.id
+    ) {
+      storage.variant.id = +updateStorageDto.variant;
+    }
+
+    // await this.storageRepo.save(storage);
+    return await this.updateAmount({
+      updateAmountDto: {
+        updateAmountType: 'in',
+        amount: updateStorageDto.amount,
+      },
+      isUpdatingOrder: true,
+      storage: storage,
+    });
   }
 
-  async updateAmount(
-    updateAmountDto: UpdateStorageAmountDto,
-    id?: number,
-    boxName?: string,
+  async updateAmount({
+    updateAmountDto,
+    id,
+    boxName,
+    isUpdatingOrder = false,
+    storage,
     isProcessingOrder = false,
-    orderId?: number,
-  ): Promise<Storage> {
-    const storage = await this.findOne(id, boxName);
+    orderId,
+  }: IUpdateAmountParams): Promise<Storage> {
+    if (!isUpdatingOrder) {
+      storage = await this.findOne(id, boxName);
+    }
 
     if (updateAmountDto.updateAmountType == 'in') {
       storage.amount += updateAmountDto.amount;
     } else {
       if (storage.amount - updateAmountDto.amount < 0) {
         throw new HttpException(
-          'Storage amount should not be less than 0',
+          'Isi storage tidak boleh kurang dari 0',
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -122,7 +145,7 @@ export class StorageService {
 
     if (storage.amount != 0) {
       throw new HttpException(
-        'Cannot delete storage, because storage amount is not 0',
+        'Tidak dapat menghapus storage, karena storage tidak kosong',
         400,
       );
     }

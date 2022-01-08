@@ -32,11 +32,11 @@ export class VariantService {
   // }
 
   async updateStock(
-    id: number,
+    id: number | Variant,
     type: 'in' | 'out',
     amount: number,
   ): Promise<Variant> {
-    const variant = await this.findOne(id);
+    const variant = await this.findOne(+id);
     if (type == 'in') {
       variant.stock += amount;
     } else {

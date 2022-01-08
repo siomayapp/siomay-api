@@ -104,15 +104,15 @@ export class StorageController {
   @Roles(UserRole.OWNER, UserRole.STORAGE)
   async updateAmount(
     @Param('id') id: string,
-    @Body() updateStorageDto: UpdateStorageAmountDto,
+    @Body() updateAmountDto: UpdateStorageAmountDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
     try {
       const start = process.hrtime();
-      const data = await this.storageService.updateAmount(
-        updateStorageDto,
-        +id,
-      );
+      const data = await this.storageService.updateAmount({
+        updateAmountDto: updateAmountDto,
+        id: +id,
+      });
       const end = process.hrtime(start);
       const exec_time = end[0] * 1000 + end[1] / 1000000;
       return { isSuccess: true, data, exec_time };

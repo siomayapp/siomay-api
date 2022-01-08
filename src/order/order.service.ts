@@ -220,16 +220,15 @@ export class OrderService {
   ): Promise<void> {
     orderVariants.forEach(async (variant) => {
       for (const storage of variant.pickedFrom) {
-        await this.storageService.updateAmount(
-          {
+        await this.storageService.updateAmount({
+          updateAmountDto: {
             amount: storage.pickedAmount,
             updateAmountType: 'out',
           },
-          undefined,
-          storage.storage,
-          true,
-          orderId,
-        );
+          boxName: storage.storage,
+          isProcessingOrder: true,
+          orderId: orderId,
+        });
       }
     });
   }
