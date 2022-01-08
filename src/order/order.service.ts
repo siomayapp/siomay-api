@@ -191,6 +191,11 @@ export class OrderService {
   }
 
   async resetOrder(order: Order): Promise<void> {
+    for (const variant of order.variants) {
+      variant.isPicked = false;
+      variant.pickedAmount = 0;
+      variant.pickedFrom = null;
+    }
     order.statuses = [
       {
         actor: 'system',
