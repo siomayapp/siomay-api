@@ -25,7 +25,9 @@ export class DashboardService {
       .createQueryBuilder(`st`)
       .leftJoinAndSelect(Order, `ord`, `ord.id = st.orderId`)
       .select(`sum(st.amount)`, `sold`)
-      .where(`st.type = 'out' and ord.currentStatus = 'finish'`)
+      .where(
+        `st.type = 'out' and (ord."currentStatus" = 'finish' or ord.cycle > 1)`,
+      )
       .getRawOne();
     return parseInt(sold == null ? 0 : sold);
   }
