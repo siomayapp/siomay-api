@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IPagination } from '../shared/types';
@@ -61,17 +66,13 @@ export class StorageService {
     updateStorageDto: UpdateStorageDto,
   ): Promise<Storage> {
     if (updateStorageDto == undefined || updateStorageDto.amount == 0) {
-      throw new HttpException(
-        'Jumlah tidak boleh kosong',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('Jumlah tidak boleh kosong');
     }
 
     const storage = await this.findOne(id);
     if (storage.amount != 0) {
-      throw new HttpException(
+      throw new BadRequestException(
         'Tidak dapat update storage, karena storage tidak kosong',
-        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -110,10 +111,7 @@ export class StorageService {
       storage.amount += updateAmountDto.amount;
     } else {
       if (storage.amount - updateAmountDto.amount < 0) {
-        throw new HttpException(
-          'Isi storage tidak boleh kurang dari 0',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException('Isi storage tidak boleh kurang dari 0');
       }
       storage.amount -= updateAmountDto.amount;
     }
@@ -144,9 +142,8 @@ export class StorageService {
     });
 
     if (storage.amount != 0) {
-      throw new HttpException(
+      throw new BadRequestException(
         'Tidak dapat menghapus storage, karena storage tidak kosong',
-        400,
       );
     }
 

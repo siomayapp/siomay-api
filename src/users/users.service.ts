@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { getManager, Not, Repository } from 'typeorm';
 import { IPagination } from '../shared/types';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Users } from './entities/users.entity';
@@ -46,7 +46,39 @@ export class UsersService {
   }
 
   async createOne(inputUser: CreateUserDto): Promise<Users> {
-    return await this.usersRepository.save(inputUser);
+    // const users = await getManager().transaction(
+    //   undefined,
+    //   async (transactionalEntityManager) => {
+    //     const findUsername = await transactionalEntityManager.findOne<Users>(
+    //       Users,
+    //       undefined,
+    //       { where: { username: inputUser.username } },
+    //     );
+    //     if (findUsername != undefined) {
+    //       throw new UnprocessableEntityException(
+    //         `User dengan username '${inputUser.username}' sudah ada`,
+    //       );
+    //     }
+
+    //     if (inputUser.phone) {
+    //       const findPhone = await transactionalEntityManager.findOne<Users>(
+    //         Users,
+    //         undefined,
+    //         { where: { phone: inputUser.phone } },
+    //       );
+    //       if (findPhone != undefined) {
+    //         throw new UnprocessableEntityException(
+    //           `User dengan nomor telepon '${inputUser.phone}' sudah ada`,
+    //         );
+    //       }
+    //     }
+
+    //     await transactionalEntityManager.save(inputUser);
+    //     return transactionalEntityManager.findOne()
+    //   },
+    // );
+    // return users as Users;
+    return this.usersRepository.save(inputUser);
   }
 
   async updateOne(id: number, inputUser: Users): Promise<Users> {

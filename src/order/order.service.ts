@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getManager, Repository } from 'typeorm';
 import { OrderHistoryService } from '../order-history/order-history.service';
@@ -28,14 +28,14 @@ export class OrderService {
       (createOrderDto.distributor == undefined ||
         createOrderDto.distributor == null)
     ) {
-      throw new HttpException('Bad Request', 400);
+      throw new BadRequestException('Distributor tidak boleh kosong');
     }
 
     if (
       createOrderDto.orderType == OrderType.DIRECT &&
       (createOrderDto.customer == undefined || createOrderDto.customer == null)
     ) {
-      throw new HttpException('Bad Request', 400);
+      throw new BadRequestException('Customer tidak boleh kosong');
     }
 
     const initStatus = lastOfArray(createOrderDto.statuses);

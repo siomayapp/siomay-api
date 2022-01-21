@@ -29,50 +29,33 @@ export class AuthController {
   async register(
     // @UploadedFile() file: Express.Multer.File,
     @Body() registrationData: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
-    try {
-      // if (!file) {
-      //   res.status(400);
-      //   return { isSuccess: false, error: 'Cannot save avatar' };
-      // }
-      // registrationData.avatar = file.originalname;
-      const data = await this.authService.register(registrationData);
-      return { isSuccess: true, data };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+    // if (!file) {
+    //   res.status(400);
+    //   return { isSuccess: false, error: 'Cannot save avatar' };
+    // }
+    // registrationData.avatar = file.originalname;
+    const start = process.hrtime();
+    const data = await this.authService.register(registrationData);
+    const end = process.hrtime(start);
+    const exec_time = end[0] * 1000 + end[1] / 1000000;
+    return { isSuccess: true, data, exec_time };
   }
 
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(
-    @Request() req: IRequestWithUser,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<HttpResponse> {
-    try {
-      const data = req.user;
-      res.status(HttpStatus.OK);
-      return { isSuccess: true, data };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+  async login(@Request() req: IRequestWithUser): Promise<HttpResponse> {
+    const start = process.hrtime();
+    const data = req.user;
+    const end = process.hrtime(start);
+    const exec_time = end[0] * 1000 + end[1] / 1000000;
+    return { isSuccess: true, data, exec_time };
   }
 
   @Post('logout')
-  async logout(
-    @Request() req: IRequestWithUser,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    try {
-      await this.authService.logout(req.user.id);
-      return { isSuccess: true };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+  async logout(@Request() req: IRequestWithUser) {
+    await this.authService.logout(req.user.id);
+    return { isSuccess: true };
   }
 }

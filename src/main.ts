@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './shared/exceptions';
 // import * as session from 'express-session';
 // import * as passport from 'passport';
 // import * as  redis from 'redis';
@@ -23,6 +24,8 @@ async function bootstrap() {
     skipMissingProperties: true,
     transform: true,
   }));
+  // const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
   app.enableCors();
   // app.use(session({
   //   cookie: {
