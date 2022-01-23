@@ -85,8 +85,4 @@ export class OrderController {
     const exec_time = end[0] * 1000 + end[1] / 1000000;
     return { isSuccess: true, exec_time };
   }
-
-  // @Get(':id/history')
-  // @Roles(UserRole.OWNER, UserRole.DISTRIBUTION)
-  // async getOrderHistory()
 }
