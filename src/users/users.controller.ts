@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpStatus,
   Param,
   Patch,
   Res,
@@ -26,36 +25,22 @@ export class UsersController {
   async getAllUsers(
     @Filter() filter: FilterUserDto,
     @Pagination() pagination: PaginationDto,
-    @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
-    try {
-      const start = process.hrtime();
-      const [data, count] = await this.usersService.findAll(pagination, filter);
-      const end = process.hrtime(start);
-      const exec_time = end[0] * 1000 + end[1] / 1000000;
-      return { isSuccess: true, data, count, exec_time };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+    const start = process.hrtime();
+    const [data, count] = await this.usersService.findAll(pagination, filter);
+    const end = process.hrtime(start);
+    const exec_time = end[0] * 1000 + end[1] / 1000000;
+    return { isSuccess: true, data, count, exec_time };
   }
 
   @Get(':id')
   @Roles(UserRole.OWNER)
-  async getUser(
-    @Param('id') id: string,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<HttpResponse> {
-    try {
-      const start = process.hrtime();
-      const data = await this.usersService.findOne(+id);
-      const end = process.hrtime(start);
-      const exec_time = end[0] * 1000 + end[1] / 1000000;
-      return { isSuccess: true, data, exec_time };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+  async getUser(@Param('id') id: string): Promise<HttpResponse> {
+    const start = process.hrtime();
+    const data = await this.usersService.findOne(+id);
+    const end = process.hrtime(start);
+    const exec_time = end[0] * 1000 + end[1] / 1000000;
+    return { isSuccess: true, data, exec_time };
   }
 
   @Patch(':id')
@@ -63,36 +48,22 @@ export class UsersController {
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserData: any,
-    @Res({ passthrough: true }) res: Response,
   ): Promise<any> {
-    try {
-      const start = process.hrtime();
-      const data = await this.usersService.updateOne(+id, updateUserData);
-      const end = process.hrtime(start);
-      const exec_time = end[0] * 1000 + end[1] / 1000000;
-      return { isSuccess: true, data, exec_time };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+    const start = process.hrtime();
+    const data = await this.usersService.updateOne(+id, updateUserData);
+    const end = process.hrtime(start);
+    const exec_time = end[0] * 1000 + end[1] / 1000000;
+    return { isSuccess: true, data, exec_time };
   }
 
   @Delete(':id')
   @Roles(UserRole.OWNER)
-  async deleteUser(
-    @Param('id') id: string,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<any> {
-    try {
-      const start = process.hrtime();
-      this.usersService.remove(+id);
-      const end = process.hrtime(start);
-      const exec_time = end[0] * 1000 + end[1] / 1000000;
-      return { isSuccess: true, exec_time };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+  async deleteUser(@Param('id') id: string): Promise<any> {
+    const start = process.hrtime();
+    this.usersService.remove(+id);
+    const end = process.hrtime(start);
+    const exec_time = end[0] * 1000 + end[1] / 1000000;
+    return { isSuccess: true, exec_time };
   }
 
   @Get('get-avatar/:avatar')
@@ -100,11 +71,6 @@ export class UsersController {
     @Param('avatar') avatar: string,
     @Res() res: Response,
   ): Promise<any> {
-    try {
-      return res.sendFile(join('uploads/avatar/', avatar), { root: 'public' });
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+    return res.sendFile(join('uploads/avatar/', avatar), { root: 'public' });
   }
 }

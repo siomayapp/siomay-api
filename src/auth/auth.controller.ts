@@ -1,16 +1,5 @@
-import {
-  Body,
-  Controller,
-  HttpException,
-  HttpStatus,
-  Post,
-  Request,
-  Res,
-  UploadedFile,
-  UseGuards,
-} from '@nestjs/common';
-import { Response } from 'express';
-import { ApiFile, Public } from '../shared/decorators';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Public } from '../shared/decorators';
 import { HttpResponse } from '../shared/types';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthService } from './auth.service';

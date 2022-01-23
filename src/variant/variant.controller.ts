@@ -1,19 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { VariantService } from './variant.service';
 import { CreateVariantDto } from './dto/create-variant.dto';
 import { UpdateVariantDto } from './dto/update-variant.dto';
 import { Roles } from 'src/shared/decorators';
 import { UserRole } from 'src/users/entities/users.role.enum';
-import { Response } from 'express';
 import { HttpResponse } from '../shared/types';
 
 @Controller('variant')
@@ -24,28 +14,15 @@ export class VariantController {
   @Roles(UserRole.OWNER)
   async create(
     @Body() createVariantDto: CreateVariantDto,
-    @Res({ passthrough: true }) res: Response,
   ): Promise<HttpResponse> {
-    try {
-      const data = await this.variantService.create(createVariantDto);
-      return { isSuccess: true, data };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+    const data = await this.variantService.create(createVariantDto);
+    return { isSuccess: true, data };
   }
 
   @Get()
-  async findAll(
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<HttpResponse> {
-    try {
-      const data = await this.variantService.findAll();
-      return { isSuccess: true, data };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+  async findAll(): Promise<HttpResponse> {
+    const data = await this.variantService.findAll();
+    return { isSuccess: true, data };
   }
 
   // @Get(':id')
@@ -59,16 +36,8 @@ export class VariantController {
   // }
 
   @Delete(':id')
-  async remove(
-    @Param('id') id: string,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<HttpResponse> {
-    try {
-      await this.variantService.remove(+id);
-      return { isSuccess: true };
-    } catch (error) {
-      res.status(500);
-      return { isSuccess: false, error: error.message };
-    }
+  async remove(@Param('id') id: string): Promise<HttpResponse> {
+    await this.variantService.remove(+id);
+    return { isSuccess: true };
   }
 }
