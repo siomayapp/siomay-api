@@ -128,7 +128,7 @@ export class OrderService {
         when 'processing' then 1
         when 'sending' then 2
         else 3
-      end, ord."deliveryDate" DESC
+      end, ord."deliveryDate" ASC
       limit ${pagination.per_page}
       offset ${(pagination.page - 1) * pagination.per_page}
     `);
