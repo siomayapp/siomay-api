@@ -61,7 +61,7 @@ export class OrderHistoryService {
         when 'processing' then 1
         when 'sending' then 2
         else 3
-      end, ohd."deliveryDate" ASC 
+      end, ohd."deliveryDate" DESC 
       limit ${pagination.per_page}
       offset ${(pagination.page - 1) * pagination.per_page}
     `);
