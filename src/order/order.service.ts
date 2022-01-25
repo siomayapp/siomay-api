@@ -69,9 +69,18 @@ export class OrderService {
       );
       order.variants[i].variant = loadedVariant;
     }
+
     await this.orderHistoryService.create({
       order: order,
       orderStatus: initStatus,
+      cycle: order.cycle,
+    });
+
+    await this.orderHistoryService.createOrderHistoryDist({
+      order: order,
+      statuses: order.statuses,
+      currentStatus: 'incoming',
+      deliveryDate: order.deliveryDate,
       cycle: order.cycle,
     });
 
@@ -183,6 +192,12 @@ export class OrderService {
       order: order,
       orderStatus: newStatus,
       cycle: order.cycle,
+    }); //
+    await this.orderHistoryService.updateOrderHistoryDist({
+      order: order,
+      deliveryDate: order.deliveryDate,
+      statuses: order.statuses,
+      currentStatus: order.currentStatus,
     });
 
     if (newStatus.status == 'finish' && order.orderType == OrderType.PERIODIC) {
@@ -215,6 +230,13 @@ export class OrderService {
     await this.orderHistoryService.create({
       order: order,
       orderStatus: lastOfArray(order.statuses),
+      cycle: order.cycle,
+    });
+    await this.orderHistoryService.createOrderHistoryDist({
+      order: order,
+      statuses: order.statuses,
+      currentStatus: 'incoming',
+      deliveryDate: order.deliveryDate,
       cycle: order.cycle,
     });
   }

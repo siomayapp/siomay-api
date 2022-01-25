@@ -30,6 +30,20 @@ export class OrderHistoryController {
     return { isSuccess: true, data, exec_time };
   }
 
+  @Get('distributor/:distributorId/order/history')
+  @Roles(UserRole.DISTRIBUTOR)
+  async getDistributorOrderHistory(
+    @Param('distributorId') distributorId: string,
+  ): Promise<HttpResponse> {
+    const start = process.hrtime();
+    const data = await this.orderHistoryService.getDistributorOrderHistory(
+      +distributorId,
+    );
+    const end = process.hrtime(start);
+    const exec_time = end[0] * 1000 + end[1] / 1000000;
+    return { isSuccess: true, data, exec_time };
+  }
+
   // @Post()
   // create(@Body() createOrderHistoryDto: CreateOrderHistoryDto) {
   //   return this.orderHistoryService.create(createOrderHistoryDto);
