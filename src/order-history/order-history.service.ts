@@ -43,20 +43,25 @@ export class OrderHistoryService {
     const data = await getManager().query(`
       SELECT ohd.id, ohd.statuses, ohd."currentStatus", ohd."deliveryDate",
         (select row_to_json(ord2) 
-          from (select * 
-                    from public.order
-                    where id = ord.id
+          from (select ord.id, ord."orderType", ord."deliveryFreq", ord.customer, ord.phone, ord.address, ord.variants, ord.statuses, ord."createdDate", ord."createdBy", ord."modifiedDate", ord."modifiedBy", ord."orderNumber", ord.cycle, ord."deliveryDate", ord."nextDeliveryDate", ord."currentStatus",
+              (select row_to_json(us) 
+              from (select id, name, role, username, phone, address 
+                from public.users 
+                where users.id = ord."distributorId") as us
+              ) as distributor 
+            from public.order
+            where id = ord.id
           ) as ord2
         ) as order
       FROM public.order_history_distributor as ohd
       LEFT JOIN public.order as ord on ord.id = ohd."orderId"
-      WHERE ord."distributorId" = ${distributorId}
+      WHERE ord."distributorId" = 22
       order by case ohd."currentStatus"
         when 'incoming' then 0
         when 'processing' then 1
         when 'sending' then 2
         else 3
-      end, ohd."deliveryDate" ASC  
+      end, ohd."deliveryDate" ASC 
       limit ${pagination.per_page}
       offset ${(pagination.page - 1) * pagination.per_page}
     `);
