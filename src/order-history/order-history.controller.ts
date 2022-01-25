@@ -12,7 +12,8 @@ import { CreateOrderHistoryDto } from './dto/create-order-history.dto';
 import { UpdateOrderHistoryDto } from './dto/update-order-history.dto';
 import { UserRole } from '../users/entities/users.role.enum';
 import { HttpResponse } from '../shared/types';
-import { Roles } from '../shared/decorators';
+import { Pagination, Roles } from '../shared/decorators';
+import { PaginationDto } from '../shared/dto';
 
 @Controller('')
 export class OrderHistoryController {
@@ -34,10 +35,12 @@ export class OrderHistoryController {
   @Roles(UserRole.DISTRIBUTOR)
   async getDistributorOrderHistory(
     @Param('distributorId') distributorId: string,
+    @Pagination() pagination: PaginationDto,
   ): Promise<HttpResponse> {
     const start = process.hrtime();
     const data = await this.orderHistoryService.getDistributorOrderHistory(
       +distributorId,
+      pagination,
     );
     const end = process.hrtime(start);
     const exec_time = end[0] * 1000 + end[1] / 1000000;

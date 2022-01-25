@@ -36,22 +36,38 @@ export class OrderHistoryService {
     return result;
   }
 
-  async getDistributorOrderHistory(distributorId: number): Promise<any> {
-    const result = await getManager().query(`
-      SELECT 
-        oh1.cycle,
-        (select json_agg(r.status::json)
-        from (select oh."orderStatus" as status
-          from public.order_history as oh 
-          where oh.cycle = oh1.cycle and oh."orderId" = oh1."orderId"
-        ) r
-        ) as statuses
-      FROM public.order_history as oh1
-      where oh1."orderId"=${distributorId}
-      group by oh1.cycle, oh1."orderId"
-      order by oh1.cycle ASC
+  async getDistributorOrderHistory(
+    distributorId: number,
+    pagination: IPagination,
+  ): Promise<[OrderHistoryDistributor[], number]> {
+    const data = await getManager().query(`
+      SELECT ohd.id, ohd.statuses, ohd."currentStatus", ohd."deliveryDate",
+        (select row_to_json(ord2) 
+          from (select * 
+                    from public.order
+                    where id = ord.id
+          ) as ord2
+        ) as order
+      FROM public.order_history_distributor as ohd
+      LEFT JOIN public.order as ord on ord.id = ohd."orderId"
+      WHERE ord."distributorId" = ${distributorId}
+      order by case ohd."currentStatus"
+        when 'incoming' then 0
+        when 'processing' then 1
+        when 'sending' then 2
+        else 3
+      end, ohd."deliveryDate" ASC  
+      limit ${pagination.per_page}
+      offset ${(pagination.page - 1) * pagination.per_page}
     `);
-    return result;
+
+    const count = await getManager().query(`
+      select count(*) from public.order_history_distributor as ohd
+      LEFT JOIN public.order as ord on ord.id = ohd."orderId"
+      WHERE ord."distributorId" = ${distributorId}
+    `);
+
+    return [data as OrderHistoryDistributor[], count[0].count];
   }
 
   async create(createOrderHistoryDto: CreateOrderHistoryDto): Promise<void> {
