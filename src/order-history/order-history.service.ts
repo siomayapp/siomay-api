@@ -55,7 +55,7 @@ export class OrderHistoryService {
         ) as order
       FROM public.order_history_distributor as ohd
       LEFT JOIN public.order as ord on ord.id = ohd."orderId"
-      WHERE ord."distributorId" = 22
+      WHERE ord."distributorId" = ${distributorId}
       order by case ohd."currentStatus"
         when 'incoming' then 0
         when 'processing' then 1
