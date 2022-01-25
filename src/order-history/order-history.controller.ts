@@ -38,13 +38,14 @@ export class OrderHistoryController {
     @Pagination() pagination: PaginationDto,
   ): Promise<HttpResponse> {
     const start = process.hrtime();
-    const data = await this.orderHistoryService.getDistributorOrderHistory(
-      +distributorId,
-      pagination,
-    );
+    const [data, count] =
+      await this.orderHistoryService.getDistributorOrderHistory(
+        +distributorId,
+        pagination,
+      );
     const end = process.hrtime(start);
     const exec_time = end[0] * 1000 + end[1] / 1000000;
-    return { isSuccess: true, data, exec_time };
+    return { isSuccess: true, data, count, exec_time };
   }
 
   // @Post()
