@@ -137,7 +137,7 @@ export class OrderService {
       select count(*) from public.order ord where ${filterQuery}
     `);
 
-    return [data as Order[], count[0].count];
+    return [data as Order[], parseInt(count[0].count)];
   }
 
   async findOne(id: number): Promise<Order> {

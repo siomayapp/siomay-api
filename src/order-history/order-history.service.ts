@@ -67,7 +67,7 @@ export class OrderHistoryService {
       WHERE ord."distributorId" = ${distributorId}
     `);
 
-    return [data as OrderHistoryDistributor[], count[0].count];
+    return [data as OrderHistoryDistributor[], parseInt(count[0].count)];
   }
 
   async create(createOrderHistoryDto: CreateOrderHistoryDto): Promise<void> {
