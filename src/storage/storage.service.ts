@@ -123,6 +123,7 @@ export class StorageService {
     );
 
     storage.variant = relatedVariant;
+    storage.filledDate = new Date();
     await this.storageRepo.save(storage);
 
     await this.storageTransactionService.create({

@@ -38,15 +38,28 @@ export class Storage {
   @Column()
   amount: number;
 
+  @Column({
+    type: 'timestamp with time zone',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  filledDate: Date;
+
+  @Column({ nullable: true })
+  filledBy: string;
+
   @Column()
-  @CreateDateColumn()
+  @CreateDateColumn({
+    type: 'timestamp with time zone',
+  })
   createdDate: Date;
 
   @Column({ nullable: true })
   createdBy: string;
 
   @Column()
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    type: 'timestamp with time zone',
+  })
   modifiedDate: Date;
 
   @Column({ nullable: true })
