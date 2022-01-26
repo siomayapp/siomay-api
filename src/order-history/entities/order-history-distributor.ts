@@ -36,10 +36,14 @@ export class OrderHistoryDistributor {
   cycle: number;
 
   @Column()
-  @CreateDateColumn()
+  @CreateDateColumn({
+    type: 'timestamp with time zone',
+  })
   createdDate: Date;
 
   @Column()
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    type: 'timestamp with time zone',
+  })
   modifiedDate: Date;
 }
