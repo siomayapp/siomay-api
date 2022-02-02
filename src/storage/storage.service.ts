@@ -50,7 +50,7 @@ export class StorageService {
       where: { ...filter },
       skip: (pagination.page - 1) * pagination.per_page,
       take: pagination.per_page,
-      order: { id: 'ASC' },
+      order: { filledDate: 'ASC' },
     });
     return result;
   }
