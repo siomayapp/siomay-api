@@ -1,29 +1,25 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { UsersController } from './users.controller';
-import { Users } from './entities/users.entity';
 import { UsersService } from './users.service';
 
 describe('UsersController', () => {
-  let usersController: UsersController;
-  let usersService: UsersService;
-  //   let userRepositoryMock: MockType
+  let controller: UsersController;
+
+  const mockUserService = {};
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [UsersService],
-    }).compile();
+    })
+      .overrideProvider(UsersService)
+      .useValue(mockUserService)
+      .compile();
 
-    usersService = moduleRef.get<UsersService>(UsersService);
-    usersController = moduleRef.get<UsersController>(UsersController);
+    controller = moduleRef.get<UsersController>(UsersController);
   });
 
-  describe('root', () => {
-    it('should return "Get All Users"', async () => {
-      let result: Promise<Users[]>;
-      jest.spyOn(usersService, 'findAll').mockImplementation(() => result);
-
-      expect(await usersController.getAllUsers()).toBe(result);
-    });
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
   });
 });

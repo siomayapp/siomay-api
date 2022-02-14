@@ -5,11 +5,16 @@ import { StorageTransactionService } from './storage-transaction.service';
 describe('StorageTransactionController', () => {
   let controller: StorageTransactionController;
 
+  const mockStorageTransactionService = {};
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [StorageTransactionController],
       providers: [StorageTransactionService],
-    }).compile();
+    })
+      .overrideProvider(StorageTransactionService)
+      .useValue(mockStorageTransactionService)
+      .compile();
 
     controller = module.get<StorageTransactionController>(
       StorageTransactionController,

@@ -5,11 +5,16 @@ import { OrderService } from './order.service';
 describe('OrderController', () => {
   let controller: OrderController;
 
+  const mockOrderService = {};
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrderController],
       providers: [OrderService],
-    }).compile();
+    })
+      .overrideProvider(OrderService)
+      .useValue(mockOrderService)
+      .compile();
 
     controller = module.get<OrderController>(OrderController);
   });

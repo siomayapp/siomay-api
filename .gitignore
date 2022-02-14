@@ -1,8 +1,10 @@
 .env
+ormlogs.log
 
 # compiled output
 /dist
 /node_modules
+/siomay-data
 
 # Logs
 logs

@@ -5,11 +5,16 @@ import { OrderHistoryService } from './order-history.service';
 describe('OrderHistoryController', () => {
   let controller: OrderHistoryController;
 
+  const mockOrderHistoryService = {};
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrderHistoryController],
       providers: [OrderHistoryService],
-    }).compile();
+    })
+      .overrideProvider(OrderHistoryService)
+      .useValue(mockOrderHistoryService)
+      .compile();
 
     controller = module.get<OrderHistoryController>(OrderHistoryController);
   });

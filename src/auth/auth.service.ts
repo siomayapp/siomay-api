@@ -1,10 +1,5 @@
 import * as argon2 from 'argon2';
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { Users } from '../users/entities/users.entity';
 import { randomBytes } from 'crypto';

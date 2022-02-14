@@ -10,8 +10,8 @@ import {
 import { StorageService } from './storage.service';
 import { CreateStorageDto } from './dto/create-storage.dto';
 import { UpdateStorageDto } from './dto/update-storage.dto';
-import { Roles, Filter, Pagination } from 'src/shared/decorators';
-import { UserRole } from 'src/users/entities/users.role.enum';
+import { Roles, Filter, Pagination } from '../shared/decorators';
+import { UserRole } from '../users/entities/users.role.enum';
 import { UpdateStorageAmountDto } from './dto/update-storage-amount.dto';
 import { HttpResponse } from '../shared/types';
 import { FilterStorageDto } from './dto/filter-storage.dto';
