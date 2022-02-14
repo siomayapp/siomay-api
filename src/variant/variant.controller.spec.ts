@@ -5,11 +5,16 @@ import { VariantService } from './variant.service';
 describe('VariantController', () => {
   let controller: VariantController;
 
+  const mockVariantService = {};
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [VariantController],
       providers: [VariantService],
-    }).compile();
+    })
+      .overrideProvider(VariantService)
+      .useValue(mockVariantService)
+      .compile();
 
     controller = module.get<VariantController>(VariantController);
   });

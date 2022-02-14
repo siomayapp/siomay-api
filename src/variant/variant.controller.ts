@@ -2,8 +2,8 @@ import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { VariantService } from './variant.service';
 import { CreateVariantDto } from './dto/create-variant.dto';
 import { UpdateVariantDto } from './dto/update-variant.dto';
-import { Roles } from 'src/shared/decorators';
-import { UserRole } from 'src/users/entities/users.role.enum';
+import { Roles } from '../shared/decorators';
+import { UserRole } from '../users/entities/users.role.enum';
 import { HttpResponse } from '../shared/types';
 
 @Controller('variant')

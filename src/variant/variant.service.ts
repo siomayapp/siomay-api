@@ -15,6 +15,10 @@ export class VariantService {
     return await this.variantRepo.save(createVariantDto);
   }
 
+  async createMany(createVariantsDto: CreateVariantDto[]): Promise<Variant[]> {
+    return await this.variantRepo.save(createVariantsDto);
+  }
+
   async findAll(): Promise<Variant[]> {
     return await this.variantRepo.find();
   }

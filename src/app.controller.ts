@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Res, UploadedFile } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ApiFile, Public } from './shared/decorators';
+import { ApiFile } from './shared/decorators';
 import { HttpResponse } from './shared/types';
 import { Response } from 'express';
 

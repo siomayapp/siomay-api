@@ -1,9 +1,13 @@
 /* eslint-disable prettier/prettier */
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './shared/exceptions';
+
 // import * as session from 'express-session';
 // import * as passport from 'passport';
 // import * as  redis from 'redis';
@@ -11,8 +15,26 @@ import { AllExceptionsFilter } from './shared/exceptions';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: new Logger()
+    logger: WinstonModule.createLogger({
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp({format: new Intl.DateTimeFormat('en', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date())}),
+            winston.format.ms(),
+            nestWinstonModuleUtilities.format.nestLike('Siomay API', { prettyPrint: true }),
+          ),
+        }),
+      ],
+    }),
   });
+
+  const document = SwaggerModule.createDocument(app, new DocumentBuilder()
+    .setTitle('Item API')
+    .setDescription('My Item API')
+    .build()
+  );
+
+  SwaggerModule.setup('docs', app, document);
   // const redisClient = redis.createClient({ url: process.env.REDIS_HOST })
   // const RedisStore = connectRedis(session);
   // redisClient.on('connect', () => console.log('CONNECTED TO REDIS'));

@@ -6,8 +6,9 @@ import { LocalStrategy } from './strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
-import { RedisCacheModule } from '../redis-cache/redis-cache.module';
-// import { SessionSerializer } from './utils/Serializer';rrrrrrr
+// import { RedisCacheModule } from '../redis-cache/redis-cache.module';
+import { AuthSeederService } from './seeds';
+// import { SessionSerializer } from './utils/Serializer';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { RedisCacheModule } from '../redis-cache/redis-cache.module';
     // RedisCacheModule,
     UsersModule,
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy], //SessionSerializer
   controllers: [AuthController],
+  providers: [AuthService, LocalStrategy, JwtStrategy, AuthSeederService], //SessionSerializer
+  exports: [AuthSeederService],
 })
 export class AuthModule {}

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,26 +11,27 @@ import { PassportModule } from '@nestjs/passport';
 import { RolesGuard } from './users/guard/user.role.guard';
 import { StorageModule } from './storage/storage.module';
 import { OrderModule } from './order/order.module';
-import { devDb, herokuDb } from './config/db';
+import { devDb } from './config/db';
 import { VariantModule } from './variant/variant.module';
 import { StorageTransactionModule } from './storage-transaction/storage-transaction.module';
 import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { OrderHistoryModule } from './order-history/order-history.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-
-const dbConfig = herokuDb; //devDb
+import { SeederModule } from './seeder.module';
 
 @Module({
   imports: [
     PassportModule.register({ session: false }),
     TypeOrmModule.forRoot({
       type: 'postgres' as any,
-      ...dbConfig,
+      ...devDb,
       synchronize: true,
       schema: 'public',
-      logger: 'file',
-      timezone: 'Asia/Jakarta',
+      // logger: 'file',
+      // logging: true,
+      timezone: process.env.DB_TZ,
       autoLoadEntities: true,
+      maxQueryExecutionTime: 5000,
     }),
     // RedisCacheModule,
     AuthModule,
@@ -41,6 +42,7 @@ const dbConfig = herokuDb; //devDb
     OrderModule,
     OrderHistoryModule,
     DashboardModule,
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [
@@ -54,6 +56,7 @@ const dbConfig = herokuDb; //devDb
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    Logger,
   ],
 })
 export class AppModule {}

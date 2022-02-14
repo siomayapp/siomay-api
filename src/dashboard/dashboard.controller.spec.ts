@@ -5,11 +5,16 @@ import { DashboardService } from './dashboard.service';
 describe('DashboardController', () => {
   let controller: DashboardController;
 
+  const mockDashboardService = {};
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [DashboardController],
       providers: [DashboardService],
-    }).compile();
+    })
+      .overrideProvider(DashboardService)
+      .useValue(mockDashboardService)
+      .compile();
 
     controller = module.get<DashboardController>(DashboardController);
   });
