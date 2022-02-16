@@ -28,7 +28,7 @@ jobs:
     - run: npm run test
 
     - name: Create .env file
-    - run: |
+      run: |
         touch .env
         echo PORT=3000 >> .env
         
