@@ -27,31 +27,31 @@ jobs:
     - run: npm run build --if-present
     - run: npm run test
 
-    - name: Create .env file
-      run: |
-        touch .env
-        echo PORT=3000 >> .env
+    # - name: Create .env file
+    #   run: |
+    #     touch .env
+    #     echo PORT=3000 >> .env
         
-        echo DB_TYPE=postgres >> .env
-        echo DB_HOST=${{ secrets.DB_HOST }} >> .env
-        echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-        echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
-        echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
-        echo DB_NAME=${{ secrets.DB_NAME }} >> .env
-        echo DB_TZ=Asia/Jakarta >> .env
+    #     echo DB_TYPE=postgres >> .env
+    #     echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+    #     echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+    #     echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+    #     echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+    #     echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+    #     echo DB_TZ=Asia/Jakarta >> .env
 
-        echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+    #     echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
 
-        echo SESSION_SECRET=${{ secrets.SESSION_SECRET }} >> .env
+    #     echo SESSION_SECRET=${{ secrets.SESSION_SECRET }} >> .env
 
-        echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
-        echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
-        echo REDIS_TTL=60 >> .env
+    #     echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
+    #     echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+    #     echo REDIS_TTL=60 >> .env
 
-        echo SEED_OWNER_NAME=${{ secrets.SEED_OWNER_NAME }} >> .env
-        echo SEED_OWNER_USERNAME=${{ secrets.SEED_OWNER_USERNAME }} >> .env
-        echo SEED_OWNER_PASSWORD=${{ secrets.SEED_OWNER_PASSWORD }} >> .env
-        echo SEED_OWNER_PHONE=${{ secrets.SEED_OWNER_PHONE }} >> .env
+    #     echo SEED_OWNER_NAME=${{ secrets.SEED_OWNER_NAME }} >> .env
+    #     echo SEED_OWNER_USERNAME=${{ secrets.SEED_OWNER_USERNAME }} >> .env
+    #     echo SEED_OWNER_PASSWORD=${{ secrets.SEED_OWNER_PASSWORD }} >> .env
+    #     echo SEED_OWNER_PHONE=${{ secrets.SEED_OWNER_PHONE }} >> .env
 
     - name: Login to Docker Hub
       if: github.event_name != 'pull_request'
