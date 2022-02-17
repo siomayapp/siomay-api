@@ -4,7 +4,7 @@ FROM node:16-alpine AS builder
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
-COPY src src
+COPY . .
 # COPY --chown=node:node . .
 RUN npm run build
 # RUN npm run build \
@@ -17,7 +17,7 @@ WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/package*.json ./
 # RUN npm install --only=production
 RUN npm install
-COPY --from=builder /usr/src/app/dist/ dist/
+COPY --from=builder /usr/src/app/dist/ ./
 # COPY --from=builder --chown=node:node /usr/src/app/package*.json ./
 # COPY --from=builder --chown=node:node /usr/src/app/node_modules/ ./node_modules/
 # COPY --from=builder --chown=node:node /usr/src/app/dist/ ./dist
