@@ -6,16 +6,18 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 # COPY --chown=node:node . .
-RUN npm run build \
-    && npm prune --production
+RUN npm run build
+# RUN npm run build \
+#     && npm prune --production
 
 FROM node:16-alpine
 # ENV NODE_ENV production
 # USER node
 WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/package*.json ./
-COPY --from=builder /usr/src/app/node_modules/ ./node_modules/
-COPY --from=builder /usr/src/app/dist/ ./dist
+# RUN npm install --only=production
+RUN npm install
+COPY --from=builder /usr/src/app/dist/ dist/
 # COPY --from=builder --chown=node:node /usr/src/app/package*.json ./
 # COPY --from=builder --chown=node:node /usr/src/app/node_modules/ ./node_modules/
 # COPY --from=builder --chown=node:node /usr/src/app/dist/ ./dist
