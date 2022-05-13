@@ -13,7 +13,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   private logger = new Logger('HTTP');
 
   use(request: Request, response: Response, next: NextFunction) {
-    const { ip, method, path: url, body } = request;
+    const { ip, method, originalUrl: url, body } = request;
     const userAgent = request.get('user-agent') || '';
 
     response.on('finish', () => {
