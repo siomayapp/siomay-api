@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 // import { Request, Response } from 'express';
@@ -11,9 +12,12 @@ import { HttpResponse } from '../types';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+  private logger = new Logger('HTTP');
+
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: any, host: ArgumentsHost): void {
+    this.logger.log(exception);
     if (!(exception instanceof HttpException)) {
       exception = new HttpException(
         exception,

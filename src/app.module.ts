@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,21 +18,15 @@ import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { OrderHistoryModule } from './order-history/order-history.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { SeederModule } from './seeder.module';
+import { WinstonModule } from 'nest-winston';
+import { winstonLoggerOptions } from './config/winston-logger';
+import { HttpLoggerMiddleware } from './shared/middlewares/logger';
 
 @Module({
   imports: [
     PassportModule.register({ session: false }),
-    TypeOrmModule.forRoot({
-      type: 'postgres' as any,
-      ...devDb,
-      synchronize: true,
-      schema: 'public',
-      // logger: 'file',
-      // logging: true,
-      timezone: process.env.DB_TZ,
-      autoLoadEntities: true,
-      maxQueryExecutionTime: 5000,
-    }),
+    TypeOrmModule.forRoot({ ...devDb }),
+    WinstonModule.forRoot({ ...winstonLoggerOptions }),
     // RedisCacheModule,
     AuthModule,
     UsersModule,
@@ -59,4 +53,8 @@ import { SeederModule } from './seeder.module';
     Logger,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(HttpLoggerMiddleware).forRoutes('*');
+  }
+}
